@@ -27,15 +27,36 @@ pub struct CellProps {
     value: u8,
 }
 
-pub fn Cell(cx: Scope<CellProps>) -> Element {
+pub fn LockCell(cx: Scope<CellProps>) -> Element {
     let class = get_class(cx.props.index);
     let id = cx.props.index;
+    // Conditionally display the value or an empty string
+    let value = if cx.props.value != 0 {
+        cx.props.value.to_string()
+    } else {
+        String::new()
+    };
 
     cx.render(rsx!(
         div {
             class: class,
             id: "{id}",
-          "{cx.props.value}"
+            "{value}"
+        }
+    ))
+}
+
+pub fn FreeCell(cx: Scope<CellProps>) -> Element {
+    let class = get_class(cx.props.index);
+    let id = cx.props.index;
+    let value = use_state(cx, || "".to_string());
+
+    cx.render(rsx!(
+        div {
+            class: class,
+            id: "{id}",
+            style: "color: green", // TODO: better color
+            "{value}"
         }
     ))
 }
