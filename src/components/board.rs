@@ -35,22 +35,27 @@ pub fn SudokuBoard(cx: Scope<SudokuBoardProps>) -> Element {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use dioxus_ssr::render;
+    use dioxus_ssr::render_lazy;
+    use rand::Rng;
     use regex::Regex;
+
+    fn create_random_full_sudoku() -> [u8; 81] {
+        let mut rng = rand::thread_rng();
+        let mut board = [0u8; 81];
+        for item in &mut board {
+            *item = rng.gen_range(1..=9);
+        }
+        board
+    }
+
+    fn generate_100_full_sudoku_boards() -> Vec<[u8; 81]> {
+        (0..100).map(|_| create_random_full_sudoku()).collect()
+    }
 
     #[test]
     fn test_sudoku_board() {
-        // Define the SudokuBoard component for testing
-        let app: Component = |cx| cx.render(rsx!(SudokuBoard { sudoku: None }));
-
-        // Create a virtual DOM instance with the component
-        let mut vdom = VirtualDom::new(app);
-
-        // Rebuild the virtual DOM to ensure it's up-to-date
-        let _ = vdom.rebuild();
-
-        // Render the virtual DOM to a string
-        let rendered_sudoku_board = render(&vdom);
+        // Render the Component into a string
+        let rendered_sudoku_board = render_lazy(rsx!(SudokuBoard { sudoku: None }));
 
         // Regex to find div elements with id and class
         let re = Regex::new(r#"<div id="(\d+)" class="([^"]+)""#).unwrap();
@@ -59,7 +64,28 @@ mod tests {
             let id: i32 = cap[1].parse().unwrap();
 
             // Check if all div IDs are between 0 and 80
-            assert!(id >= 0 && id < 81);
+            assert!((0..81).contains(&id));
+        }
+    }
+
+    #[test]
+    fn test_100_full_sudoku_boards() {
+        let full_boards = generate_100_full_sudoku_boards();
+        let re = Regex::new(r#"<div[^>]*>([^<]*)</div>"#).unwrap();
+
+        for board in full_boards {
+            let rendered_board = render_lazy(rsx!(SudokuBoard {
+                sudoku: Some(board)
+            }));
+
+            for cap in re.captures_iter(&rendered_board) {
+                let inner_text = &cap[1];
+                assert!(
+                    !inner_text.trim().is_empty(),
+                    "Found empty cell in board: {}",
+                    rendered_board
+                );
+            }
         }
     }
 }
