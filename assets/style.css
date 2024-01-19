@@ -10,7 +10,7 @@
 }
 
 #container div {
-  background-color: whitesmoke;
+  /* background-color: whitesmoke; */
   height: 60px;
   width: 60px;
   box-sizing: border-box;
@@ -19,44 +19,51 @@
   vertical-align: middle;
   line-height: 60px;
   font-size: 30px;
-  /* TODO: better color */
-  color: black;
+  color: #38485f;
 
 }
 
 #container div:hover {
-  background-color: lightskyblue;
+  background-color: #e4ebf2;
+}
+
+.highlight {
+  background-color: #c2ddf8;
+}
+
+.input {
+  color: #3b59a9;
 }
 
 .lsb {
-  border-left: black 2px solid;
+  border-left: #38485f 2px solid;
 }
 
 .bsb {
-  border-bottom: black 2px solid;
+  border-bottom: #38485f 2px solid;
 }
 
 .rsb {
-  border-right: black 2px solid;
+  border-right: #38485f 2px solid;
 }
 
 .tsb {
-  border-top: black 2px solid;
+  border-top: #38485f 2px solid;
 }
 
 
 .ldb {
-  border-left: black 0.6px dashed;
+  border-left: black 0.8px dashed;
 }
 
 .bdb {
-  border-bottom: black 0.6px dashed;
+  border-bottom: black 0.8px dashed;
 }
 
 .rdb {
-  border-right: black 0.6px dashed;
+  border-right: black 0.8px dashed;
 }
 
 .tdb {
-  border-top: black 0.6px dashed;
+  border-top: black 0.8px dashed;
 }

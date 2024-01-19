@@ -173,7 +173,6 @@ pub fn FreeCell(cx: Scope<CellProps>) -> Element {
         div {
             class: class,
             id: "{id}",
-            style: "color: green", // TODO: better color
             "{value}"
         }
     ))
