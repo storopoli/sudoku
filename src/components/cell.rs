@@ -63,6 +63,64 @@ fn get_class(id: u8) -> &'static str {
     }
 }
 
+/// Calculates the indices of all cells related to a given cell in a Sudoku
+/// puzzle.
+///
+/// In a Sudoku puzzle, a cell is related to all other cells in the same row,
+/// the same column, and the same 3x3 sub-square.
+/// This function takes the index of a cell and returns a list of indices for
+/// all related cells.
+///
+/// ## Parameters
+///
+/// - `index: u8`: The index of the cell in the Sudoku grid.
+///    Must be in the range 0 to 80.
+///
+/// ## Returns
+///
+/// Returns a `Vec<u8>` containing the indices of all cells related to the
+/// given cell, excluding the cell itself.
+///
+/// ## Examples
+///
+/// Basic usage:
+///
+/// ```rust
+/// let related_cells = get_related_cells(40); // Center cell of the board
+/// let related_cells = get_related_cells(0); // Top-left corner of the board
+/// ```
+fn get_related_cells(index: u8) -> Vec<u8> {
+    let mut related_cells = Vec::new();
+    let row = index / 9;
+    let col = index % 9;
+    let start_row = row / 3 * 3;
+    let start_col = col / 3 * 3;
+
+    // Add cells in the same row
+    for i in 0..9 {
+        related_cells.push(row * 9 + i);
+    }
+
+    // Add cells in the same column
+    for i in 0..9 {
+        related_cells.push(i * 9 + col);
+    }
+
+    // Add cells in the same 3x3 sub-grid
+    for i in start_row..start_row + 3 {
+        for j in start_col..start_col + 3 {
+            related_cells.push(i * 9 + j);
+        }
+    }
+
+    // Remove duplicates and the original cell
+    related_cells.sort_unstable();
+    related_cells.dedup();
+    related_cells.retain(|&x| x != index);
+
+    related_cells
+}
+
 /// Properties for the [`FreeCell`] and [`LockCell`] components in the Sudoku
 /// game.
 ///
@@ -239,5 +297,35 @@ mod tests {
 
             assert_eq!(class_attr, get_class(id));
         }
+    }
+
+    #[test]
+    fn test_related_cells_middle() {
+        let index = 40; // Center cell of the board
+        let related = get_related_cells(index);
+        assert_eq!(related.len(), 20); // 8 in row, 8 in column, 4 in sub-grid, excluding duplicates and the cell itself
+        assert!(related.contains(&32)); // Another cell in the same sub-grid
+        assert!(related.contains(&39)); // Another cell in the same row
+        assert!(related.contains(&49)); // Another cell in the same column
+    }
+
+    #[test]
+    fn test_related_cells_corner() {
+        let index = 0; // Top-left corner cell of the board
+        let related = get_related_cells(index);
+        assert_eq!(related.len(), 20); // 8 in row, 8 in column, 4 in sub-grid, excluding duplicates and the cell itself
+        assert!(related.contains(&1)); // Another cell in the same row
+        assert!(related.contains(&9)); // Another cell in the same column
+        assert!(related.contains(&10)); // Another cell in the same sub-grid
+    }
+
+    #[test]
+    fn test_related_cells_edge() {
+        let index = 9; // An edge cell (but not corner)
+        let related = get_related_cells(index);
+        assert_eq!(related.len(), 20); // 8 in row, 8 in column, 4 in sub-grid, excluding duplicates and the cell itself
+        assert!(related.contains(&0)); // Another cell in the same column
+        assert!(related.contains(&11)); // Another cell in the same row
+        assert!(related.contains(&20)); // Another cell in the same sub-grid
     }
 }
