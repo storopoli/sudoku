@@ -9,6 +9,11 @@
 
 ## Performance
 
+<!-- FIXME: add information -->
+- Rust
+- WASM
+- `&str` and `u8`
+
 ## License
 
 The source code is licensed under a

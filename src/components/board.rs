@@ -1,14 +1,80 @@
+//! # Board Module
+//!
+//! The `board` module is responsible for defining and rendering the Sudoku
+//! board.
+//! It includes the logic for laying out the cells in a grid,
+//! handling user interactions,
+//! and updating the state of the board as the game progresses.
+//!
+//! This module provides the [`SudokuBoard`] component,
+//! which is the central element of the Sudoku game interface,
+//! displaying the puzzle to the user and allowing interaction
+//!  with individual cells.
+
 use dioxus::prelude::*;
 
 use crate::components::cell::{FreeCell, LockCell};
 use crate::utils::create_sudoku;
 
+/// Props for `SudokuBoard` component.
+///
+/// This struct contains the properties used by the [`SudokuBoard`] component.
+/// It can optionally hold a predefined Sudoku puzzle, which is a
+/// 9x9 grid represented as a flat array of 81 `u8` values.
+/// Each value should be in the range 0-9, where 0 represents an empty cell.
+///
+/// # Examples
+///
+/// ```rust
+/// let puzzle: [u8; 81] = [
+///     // ... your Sudoku puzzle here ...
+/// ];
+/// let props = SudokuBoardProps { sudoku: Some(puzzle) };
+/// ```
+///
+/// Or you can use a random generated Sudoku board:
+///
+/// ```rust
+/// let props = SudokuBoardProps { sudoku: None };
+/// ```
 #[derive(Props, PartialEq)]
 pub struct SudokuBoardProps {
     #[props(!optional)]
     sudoku: Option<[u8; 81]>,
 }
 
+/// Component to render a Sudoku board.
+///
+/// This component renders a Sudoku board which can be either randomly generated or
+/// initialized with a predefined puzzle provided through [`SudokuBoardProps`].
+///
+/// Each cell in the board is represented as either a [`LockCell`]
+/// or [`FreeCell`] depending on whether it is a part of the initial puzzle
+/// or an empty cell that can be filled by the user.
+///
+/// # Example
+///
+/// ```rust
+/// # use dioxus::prelude::*;
+/// # fn main() {
+/// let puzzle: [u8; 81] = [
+///     // ... your Sudoku puzzle here ...
+/// ];
+/// cx.render(rsx!(SudokuBoard { sudoku: Some(puzzle) }))
+/// # }
+/// ```
+///
+/// Or you can use a random generated Sudoku board:
+///
+/// ```rust
+/// # use dioxus::prelude::*;
+/// # fn main() {
+/// let puzzle: [u8; 81] = [
+///     // ... your Sudoku puzzle here ...
+/// ];
+/// cx.render(rsx!(SudokuBoard { sudoku: None }))
+/// # }
+/// ```
 pub fn SudokuBoard(cx: Scope<SudokuBoardProps>) -> Element {
     let sudoku = cx.props.sudoku.unwrap_or(create_sudoku());
 
