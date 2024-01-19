@@ -36,6 +36,10 @@
   background-color: #c2ddf8;
 }
 
+.selected {
+  background-color: #e4ebf2;
+}
+
 .input {
   color: #3b59a9;
 }

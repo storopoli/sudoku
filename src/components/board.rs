@@ -86,12 +86,16 @@ pub fn SudokuBoard(cx: Scope<SudokuBoardProps>) -> Element {
                 rsx!(FreeCell {
                     index: index as u8,
                     value: value,
+                    highlighted: false,
+                    selected: false,
                 })
             } else {
                 // Render LockCell for non-empty cells
                 rsx!(LockCell {
                     index: index as u8,
                     value: value,
+                    highlighted: false,
+                    selected: false,
                 })
             }
             }

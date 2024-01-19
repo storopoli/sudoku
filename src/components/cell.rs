@@ -11,7 +11,7 @@
 //! and handling user input,
 //! while conforming to the overall style and rules of the Sudoku game.
 
-use crate::utils::{get_class, get_related_cells};
+use crate::utils::get_class;
 use dioxus::prelude::*;
 
 /// Properties for the [`FreeCell`] and [`LockCell`] components in the Sudoku
@@ -51,6 +51,8 @@ use dioxus::prelude::*;
 pub struct CellProps {
     index: u8,
     value: u8,
+    highlighted: bool,
+    selected: bool,
 }
 
 /// Represents a locked cell in a Sudoku puzzle.
@@ -78,7 +80,20 @@ pub struct CellProps {
 /// // Renders a cell at index 5 with a fixed value of 3.
 /// ```
 pub fn LockCell(cx: Scope<CellProps>) -> Element {
-    let class = get_class(cx.props.index);
+    let base_class = get_class(cx.props.index);
+
+    // Construct the full class string
+    let class = format!(
+        "{}{}{}",
+        base_class,
+        if cx.props.highlighted {
+            " highlighted"
+        } else {
+            ""
+        },
+        if cx.props.selected { " selected" } else { "" },
+    );
+
     let id = cx.props.index;
     // Conditionally display the value or an empty string
     let value = if cx.props.value != 0 {
@@ -89,7 +104,7 @@ pub fn LockCell(cx: Scope<CellProps>) -> Element {
 
     cx.render(rsx!(
         div {
-            class: class,
+            class: "{class}",
             id: "{id}",
             "{value}"
         }
@@ -116,15 +131,28 @@ pub fn LockCell(cx: Scope<CellProps>) -> Element {
 /// // Renders an empty cell at index 10 that can be filled by the user.
 /// ```
 pub fn FreeCell(cx: Scope<CellProps>) -> Element {
-    let class = get_class(cx.props.index);
+    let base_class = get_class(cx.props.index);
+
+    // Construct the full class string
+    let class = format!(
+        "{}{}{}",
+        base_class,
+        if cx.props.highlighted {
+            " highlighted"
+        } else {
+            ""
+        },
+        if cx.props.selected { " selected" } else { "" },
+    );
+
     let id = cx.props.index;
     let value = use_state(cx, || "".to_string());
 
     cx.render(rsx!(
         div {
-            class: class,
+            class: "{class}",
             id: "{id}",
-            "{value}"
+            "{&value}"
         }
     ))
 }
@@ -139,11 +167,21 @@ mod tests {
     #[test]
     fn test_lock_cell() {
         // Test with a non-zero value
-        let rendered_lock_cell = render_lazy(rsx!(LockCell { index: 0, value: 5 }));
+        let rendered_lock_cell = render_lazy(rsx!(LockCell {
+            index: 0,
+            value: 5,
+            highlighted: false,
+            selected: false
+        }));
         assert!(rendered_lock_cell.contains('5'));
 
         // Test with a zero value
-        let rendered_lock_cell_zero = render_lazy(rsx!(LockCell { index: 1, value: 0 }));
+        let rendered_lock_cell_zero = render_lazy(rsx!(LockCell {
+            index: 1,
+            value: 0,
+            highlighted: false,
+            selected: false
+        }));
         // Adjust this based on whether you expect to render "0" or an empty string
         assert!(!rendered_lock_cell_zero.contains('0'));
     }
@@ -151,7 +189,12 @@ mod tests {
     #[test]
     fn test_free_cell() {
         // Assuming FreeCell starts with an empty value
-        let rendered_free_cell = render_lazy(rsx!(FreeCell { index: 0, value: 0 }));
+        let rendered_free_cell = render_lazy(rsx!(FreeCell {
+            index: 0,
+            value: 0,
+            highlighted: false,
+            selected: false
+        }));
 
         // Test with a zero value
         assert!(rendered_free_cell.contains('0'));
@@ -164,7 +207,9 @@ mod tests {
         for id in 0..81 {
             let rendered = render_lazy(rsx!(FreeCell {
                 index: id,
-                value: 0
+                value: 0,
+                highlighted: false,
+                selected: false
             }));
             let caps = re.captures(&rendered).unwrap();
             let class_attr = &caps[1];
@@ -184,6 +229,8 @@ mod tests {
             let rendered = render_lazy(rsx!(LockCell {
                 index: id,
                 value: value,
+                highlighted: false,
+                selected: false
             }));
             let caps = re.captures(&rendered).unwrap();
             let class_attr = &caps[1];
