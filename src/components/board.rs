@@ -25,3 +25,35 @@ pub fn SudokuBoard(cx: Scope) -> Element {
             }
     }))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use dioxus_ssr::render;
+    use regex::Regex;
+
+    #[test]
+    fn test_sudoku_board() {
+        // Define the SudokuBoard component for testing
+        let app: Component = |cx| cx.render(rsx!(SudokuBoard {}));
+
+        // Create a virtual DOM instance with the component
+        let mut vdom = VirtualDom::new(app);
+
+        // Rebuild the virtual DOM to ensure it's up-to-date
+        let _ = vdom.rebuild();
+
+        // Render the virtual DOM to a string
+        let rendered_sudoku_board = render(&vdom);
+
+        // Regex to find div elements with id and class
+        let re = Regex::new(r#"<div id="(\d+)" class="([^"]+)""#).unwrap();
+
+        for cap in re.captures_iter(&rendered_sudoku_board) {
+            let id: i32 = cap[1].parse().unwrap();
+
+            // Check if all div IDs are between 0 and 80
+            assert!(id >= 0 && id < 81);
+        }
+    }
+}

@@ -17,6 +17,8 @@ getrandom = { version = "0.2", features = ["js"] }
 #js-sys = "0.3"
 
 [dev-dependencies]
+dioxus-ssr = "0.4.3"
+regex = "1"
 
 [profile.release]
 lto = true
