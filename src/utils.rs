@@ -145,6 +145,63 @@ pub fn get_related_cells(index: u8) -> Vec<u8> {
     related_cells
 }
 
+/// Updates a class string by adding or removing a specified class.
+/// Useful for CSS class changes in DOM Elements.
+///
+/// This function takes an existing class string (`base_class`), a specific class
+/// to add or remove (`class`), and a boolean flag (`add`) that indicates whether
+/// to add or remove the class. It then updates the class string accordingly.
+///
+/// If `add` is `true` and the class is not already in the `base_class` string,
+/// the function appends it. If `add` is `false` and the class is present,
+/// the function removes it.
+/// The function also ensures that there are no leading or trailing whitespaces
+/// and that classes are separated by a single space.
+///
+/// ## Parameters
+///
+/// - `base_class: String`: The original class string.
+/// - `class: String`: The class to add or remove.
+/// - `add: bool`: A boolean flag indicating whether to add (`true`) or remove (`false`) the class.
+///
+/// ## Returns
+///
+/// Returns the updated class string.
+///
+/// ## Examples
+///
+/// Adding a class:
+///
+/// ```rust
+/// let class_string = "some-class another-class".to_string();
+/// let updated = update_class(class_string, "selected".to_string(), true);
+/// ```
+///
+/// Removing a class:
+///
+/// ```rust
+/// let class_string = "some-class another-class selected".to_string();
+/// let updated = update_class(class_string, "selected".to_string(), false);
+/// ```
+pub fn update_class(mut base_class: String, class: String, add: bool) -> String {
+    let contains_class = base_class.split_whitespace().any(|word| word == class);
+
+    if add && !contains_class {
+        // Add the class if it's not present and needs to be added
+        base_class.push(' '); // Ensure there's a space before adding
+        base_class.push_str(&class);
+    } else if !add && contains_class {
+        // Remove the class if it's present and needs to be removed
+        base_class = base_class
+            .split_whitespace()
+            .filter(|&word| word != class)
+            .collect::<Vec<_>>()
+            .join(" ");
+    }
+
+    base_class.trim().to_string() // Trim whitespace and return
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -193,5 +250,57 @@ mod tests {
         assert!(related.contains(&0)); // Another cell in the same column
         assert!(related.contains(&11)); // Another cell in the same row
         assert!(related.contains(&20)); // Another cell in the same sub-grid
+    }
+
+    #[test]
+    fn test_update_class() {
+        assert_eq!(
+            update_class(
+                "some-class another-class".to_string(),
+                "selected".to_string(),
+                true
+            ),
+            "some-class another-class selected"
+        );
+        assert_eq!(
+            update_class(
+                "some-class another-class selected".to_string(),
+                "selected".to_string(),
+                false
+            ),
+            "some-class another-class"
+        );
+        assert_eq!(
+            update_class("".to_string(), "selected".to_string(), true),
+            "selected"
+        );
+        assert_eq!(
+            update_class("selected".to_string(), "selected".to_string(), false),
+            ""
+        );
+
+        // Testing removal from between other classes
+        assert_eq!(
+            update_class(
+                "some-class selected another-class".to_string(),
+                "selected".to_string(),
+                false
+            ),
+            "some-class another-class"
+        );
+
+        // Testing idempotence
+        assert_eq!(
+            update_class(
+                "some-class selected".to_string(),
+                "selected".to_string(),
+                true
+            ),
+            "some-class selected"
+        );
+        assert_eq!(
+            update_class("some-class".to_string(), "selected".to_string(), false),
+            "some-class"
+        );
     }
 }
