@@ -18,6 +18,7 @@ use crate::components::board::SudokuBoard;
 ///
 /// It is designed to be used as the root of the web application,
 /// orchestrating the entire Sudoku game and its user interface.
+#[must_use]
 pub fn App(cx: Scope) -> Element {
     cx.render(rsx!(SudokuBoard { sudoku: None }))
 }

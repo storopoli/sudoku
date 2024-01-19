@@ -37,7 +37,7 @@ use crate::utils::create_sudoku;
 /// ```rust
 /// let props = SudokuBoardProps { sudoku: None };
 /// ```
-#[derive(Props, PartialEq)]
+#[derive(Props, PartialEq, Eq)]
 pub struct SudokuBoardProps {
     #[props(!optional)]
     sudoku: Option<[u8; 81]>,
@@ -51,6 +51,11 @@ pub struct SudokuBoardProps {
 /// Each cell in the board is represented as either a [`LockCell`]
 /// or [`FreeCell`] depending on whether it is a part of the initial puzzle
 /// or an empty cell that can be filled by the user.
+///
+/// # Panics
+///
+/// The component will panic ifcannot convert any of the Sudoku's board cells
+/// indexes from `usize` into a `u8`
 ///
 /// # Example
 ///
@@ -75,8 +80,9 @@ pub struct SudokuBoardProps {
 /// cx.render(rsx!(SudokuBoard { sudoku: None }))
 /// # }
 /// ```
+#[allow(clippy::module_name_repetitions)]
 pub fn SudokuBoard(cx: Scope<SudokuBoardProps>) -> Element {
-    let sudoku = cx.props.sudoku.unwrap_or(create_sudoku());
+    let sudoku = cx.props.sudoku.unwrap_or_else(create_sudoku);
 
     cx.render(rsx!(div {
         id: "container",
@@ -84,7 +90,7 @@ pub fn SudokuBoard(cx: Scope<SudokuBoardProps>) -> Element {
             if value == 0 {
                 // Render FreeCell for empty cells
                 rsx!(FreeCell {
-                    index: index as u8,
+                    index: u8::try_from(index).expect("cannot convert from u8"),
                     value: value,
                     highlighted: false,
                     selected: false,
@@ -92,7 +98,7 @@ pub fn SudokuBoard(cx: Scope<SudokuBoardProps>) -> Element {
             } else {
                 // Render LockCell for non-empty cells
                 rsx!(LockCell {
-                    index: index as u8,
+                    index: u8::try_from(index).expect("cannot convert from u8"),
                     value: value,
                     highlighted: false,
                     selected: false,
@@ -128,10 +134,10 @@ mod tests {
         let rendered_sudoku_board = render_lazy(rsx!(SudokuBoard { sudoku: None }));
 
         // Regex to find div elements with id and class
-        let re = Regex::new(r#"<div id="(\d+)" class="([^"]+)""#).unwrap();
+        let re = Regex::new(r#"<div id="(\d+)" class="([^"]+)""#).expect("failed to compile regex");
 
         for cap in re.captures_iter(&rendered_sudoku_board) {
-            let id: i32 = cap[1].parse().unwrap();
+            let id: i32 = cap[1].parse().expect("failed to parse regex capture");
 
             // Check if all div IDs are between 0 and 80
             assert!((0..81).contains(&id));
@@ -141,7 +147,7 @@ mod tests {
     #[test]
     fn test_100_full_sudoku_boards() {
         let full_boards = generate_100_full_sudoku_boards();
-        let re = Regex::new(r#"<div[^>]*>([^<]*)</div>"#).unwrap();
+        let re = Regex::new(r"<div[^>]*>([^<]*)</div>").expect("failed to compile regex");
 
         for board in full_boards {
             let rendered_board = render_lazy(rsx!(SudokuBoard {
@@ -152,8 +158,7 @@ mod tests {
                 let inner_text = &cap[1];
                 assert!(
                     !inner_text.trim().is_empty(),
-                    "Found empty cell in board: {}",
-                    rendered_board
+                    "Found empty cell in board: {rendered_board}"
                 );
             }
         }

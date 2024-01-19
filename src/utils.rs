@@ -33,6 +33,7 @@ use sudoku::board::Sudoku;
 /// ```rust
 /// let puzzle = create_sudoku();
 /// ```
+#[must_use]
 pub fn create_sudoku() -> [u8; 81] {
     Sudoku::generate().to_bytes()
 }
@@ -66,7 +67,8 @@ pub fn create_sudoku() -> [u8; 81] {
 ///
 /// Note: The returned classes are meant to be used in the context of a web page
 /// or a web-based UI renderer.
-pub fn get_class(id: u8) -> &'static str {
+#[must_use]
+pub const fn get_class(id: u8) -> &'static str {
     match id {
         0 | 3 | 6 | 27 | 30 | 33 | 54 | 57 | 60 => "tsb lsb rdb bdb",
         1 | 4 | 7 | 28 | 31 | 34 | 55 | 58 | 61 => "tsb  bdb",
@@ -113,6 +115,7 @@ pub fn get_class(id: u8) -> &'static str {
 /// let related_cells = get_related_cells(40); // Center cell of the board
 /// let related_cells = get_related_cells(0); // Top-left corner of the board
 /// ```
+#[must_use]
 pub fn get_related_cells(index: u8) -> Vec<u8> {
     let mut related_cells = Vec::new();
     let row = index / 9;
@@ -183,13 +186,14 @@ pub fn get_related_cells(index: u8) -> Vec<u8> {
 /// let class_string = "some-class another-class selected".to_string();
 /// let updated = update_class(class_string, "selected".to_string(), false);
 /// ```
-pub fn update_class(mut base_class: String, class: String, add: bool) -> String {
+#[must_use]
+pub fn update_class(mut base_class: String, class: &str, add: bool) -> String {
     let contains_class = base_class.split_whitespace().any(|word| word == class);
 
     if add && !contains_class {
         // Add the class if it's not present and needs to be added
         base_class.push(' '); // Ensure there's a space before adding
-        base_class.push_str(&class);
+        base_class.push_str(class);
     } else if !add && contains_class {
         // Remove the class if it's present and needs to be removed
         base_class = base_class
@@ -255,35 +259,25 @@ mod tests {
     #[test]
     fn test_update_class() {
         assert_eq!(
-            update_class(
-                "some-class another-class".to_string(),
-                "selected".to_string(),
-                true
-            ),
+            update_class("some-class another-class".to_string(), "selected", true),
             "some-class another-class selected"
         );
         assert_eq!(
             update_class(
                 "some-class another-class selected".to_string(),
-                "selected".to_string(),
+                "selected",
                 false
             ),
             "some-class another-class"
         );
-        assert_eq!(
-            update_class("".to_string(), "selected".to_string(), true),
-            "selected"
-        );
-        assert_eq!(
-            update_class("selected".to_string(), "selected".to_string(), false),
-            ""
-        );
+        assert_eq!(update_class(String::new(), "selected", true), "selected");
+        assert_eq!(update_class("selected".to_string(), "selected", false), "");
 
         // Testing removal from between other classes
         assert_eq!(
             update_class(
                 "some-class selected another-class".to_string(),
-                "selected".to_string(),
+                "selected",
                 false
             ),
             "some-class another-class"
@@ -291,15 +285,11 @@ mod tests {
 
         // Testing idempotence
         assert_eq!(
-            update_class(
-                "some-class selected".to_string(),
-                "selected".to_string(),
-                true
-            ),
+            update_class("some-class selected".to_string(), "selected", true),
             "some-class selected"
         );
         assert_eq!(
-            update_class("some-class".to_string(), "selected".to_string(), false),
+            update_class("some-class".to_string(), "selected", false),
             "some-class"
         );
     }

@@ -47,7 +47,8 @@ use dioxus::prelude::*;
 ///
 /// In this example, `cell_props` represents a cell at index 5
 /// (sixth cell in the grid) with a value of 3.
-#[derive(Props, PartialEq)]
+#[allow(clippy::module_name_repetitions)]
+#[derive(Props, PartialEq, Eq)]
 pub struct CellProps {
     index: u8,
     value: u8,
@@ -79,6 +80,8 @@ pub struct CellProps {
 /// let locked_cell = rsx!(LockCell { index: 5, value: 3 });
 /// // Renders a cell at index 5 with a fixed value of 3.
 /// ```
+#[allow(clippy::module_name_repetitions)]
+#[must_use]
 pub fn LockCell(cx: Scope<CellProps>) -> Element {
     let base_class = get_class(cx.props.index);
 
@@ -130,6 +133,7 @@ pub fn LockCell(cx: Scope<CellProps>) -> Element {
 /// let free_cell = rsx!(FreeCell { index: 10, value: 0 });
 /// // Renders an empty cell at index 10 that can be filled by the user.
 /// ```
+#[allow(clippy::module_name_repetitions)]
 pub fn FreeCell(cx: Scope<CellProps>) -> Element {
     let base_class = get_class(cx.props.index);
 
@@ -146,7 +150,7 @@ pub fn FreeCell(cx: Scope<CellProps>) -> Element {
     );
 
     let id = cx.props.index;
-    let value = use_state(cx, || "".to_string());
+    let value = use_state(cx, String::new);
 
     cx.render(rsx!(
         div {
@@ -202,7 +206,7 @@ mod tests {
 
     #[test]
     fn test_free_cell_classes() {
-        let re = Regex::new(r#"<div[^>]*class="([^"]*)""#).unwrap();
+        let re = Regex::new(r#"<div[^>]*class="([^"]*)""#).expect("failed to compile regex");
 
         for id in 0..81 {
             let rendered = render_lazy(rsx!(FreeCell {
@@ -211,7 +215,9 @@ mod tests {
                 highlighted: false,
                 selected: false
             }));
-            let caps = re.captures(&rendered).unwrap();
+            let caps = re
+                .captures(&rendered)
+                .expect("failed to parse regex capture");
             let class_attr = &caps[1];
 
             assert_eq!(class_attr, get_class(id));
@@ -222,7 +228,7 @@ mod tests {
     fn test_lock_cell_classes() {
         let mut rng = rand::thread_rng();
 
-        let re = Regex::new(r#"<div[^>]*class="([^"]*)""#).unwrap();
+        let re = Regex::new(r#"<div[^>]*class="([^"]*)""#).expect("failed to compile regex");
 
         for id in 0..81 {
             let value: u8 = rng.gen_range(1..=9);
@@ -232,7 +238,9 @@ mod tests {
                 highlighted: false,
                 selected: false
             }));
-            let caps = re.captures(&rendered).unwrap();
+            let caps = re
+                .captures(&rendered)
+                .expect("failed to parse regex capture");
             let class_attr = &caps[1];
 
             assert_eq!(class_attr, get_class(id));
