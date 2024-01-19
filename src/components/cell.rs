@@ -60,3 +60,67 @@ pub fn FreeCell(cx: Scope<CellProps>) -> Element {
         }
     ))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use dioxus_ssr::render_lazy;
+    use rand::Rng;
+    use regex::Regex;
+
+    #[test]
+    fn test_lock_cell() {
+        // Test with a non-zero value
+        let rendered_lock_cell = render_lazy(rsx!(LockCell { index: 0, value: 5 }));
+        assert!(rendered_lock_cell.contains('5'));
+
+        // Test with a zero value
+        let rendered_lock_cell_zero = render_lazy(rsx!(LockCell { index: 1, value: 0 }));
+        // Adjust this based on whether you expect to render "0" or an empty string
+        assert!(!rendered_lock_cell_zero.contains('0'));
+    }
+
+    #[test]
+    fn test_free_cell() {
+        // Assuming FreeCell starts with an empty value
+        let rendered_free_cell = render_lazy(rsx!(FreeCell { index: 0, value: 0 }));
+
+        // Test with a zero value
+        assert!(rendered_free_cell.contains('0'));
+    }
+
+    #[test]
+    fn test_free_cell_classes() {
+        let re = Regex::new(r#"<div[^>]*class="([^"]*)""#).unwrap();
+
+        for id in 0..81 {
+            let rendered = render_lazy(rsx!(FreeCell {
+                index: id,
+                value: 0
+            }));
+            let caps = re.captures(&rendered).unwrap();
+            let class_attr = &caps[1];
+
+            assert_eq!(class_attr, get_class(id));
+        }
+    }
+
+    #[test]
+    fn test_lock_cell_classes() {
+        let mut rng = rand::thread_rng();
+
+        let re = Regex::new(r#"<div[^>]*class="([^"]*)""#).unwrap();
+
+        for id in 0..81 {
+            let value: u8 = rng.gen_range(1..=9);
+            let rendered = render_lazy(rsx!(LockCell {
+                index: id,
+                value: value,
+            }));
+            let caps = re.captures(&rendered).unwrap();
+            let class_attr = &caps[1];
+
+            assert_eq!(class_attr, get_class(id));
+        }
+    }
+}
