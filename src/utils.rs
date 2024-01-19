@@ -10,6 +10,29 @@
 
 use sudoku::board::Sudoku;
 
+/// Generates a new Sudoku puzzle.
+///
+/// This function creates a complete 9x9 Sudoku puzzle. Each Sudoku puzzle
+/// is generated randomly and returned as a flat array of 81 `u8` values,
+/// representing the puzzle's cells.
+/// In this array, each value corresponds to a cell in the Sudoku grid,
+/// ordered row by row from top-left to bottom-right.
+///
+/// The values in the array range from 1 to 9,
+/// corresponding to the filled cells in the puzzle.
+/// A value of 0 indicates an empty cell that players need to fill in.
+///
+/// ## Returns
+///
+/// Returns a `[u8; 81]`, which represents a 9x9 Sudoku puzzle.
+///
+/// ## Examples
+///
+/// Basic usage:
+///
+/// ```rust
+/// let puzzle = create_sudoku();
+/// ```
 pub fn create_sudoku() -> [u8; 81] {
     Sudoku::generate().to_bytes()
 }
