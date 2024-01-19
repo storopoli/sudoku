@@ -3,8 +3,14 @@ use dioxus::prelude::*;
 use crate::components::cell::{FreeCell, LockCell};
 use crate::utils::create_sudoku;
 
-pub fn SudokuBoard(cx: Scope) -> Element {
-    let sudoku = create_sudoku();
+#[derive(Props, PartialEq)]
+pub struct SudokuBoardProps {
+    #[props(!optional)]
+    sudoku: Option<[u8; 81]>,
+}
+
+pub fn SudokuBoard(cx: Scope<SudokuBoardProps>) -> Element {
+    let sudoku = cx.props.sudoku.unwrap_or(create_sudoku());
 
     cx.render(rsx!(div {
         id: "container",
@@ -35,7 +41,7 @@ mod tests {
     #[test]
     fn test_sudoku_board() {
         // Define the SudokuBoard component for testing
-        let app: Component = |cx| cx.render(rsx!(SudokuBoard {}));
+        let app: Component = |cx| cx.render(rsx!(SudokuBoard { sudoku: None }));
 
         // Create a virtual DOM instance with the component
         let mut vdom = VirtualDom::new(app);
