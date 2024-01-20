@@ -11,7 +11,7 @@
 //! and handling user input,
 //! while conforming to the overall style and rules of the Sudoku game.
 
-use crate::utils::get_class;
+use crate::utils::{get_class, update_class};
 use dioxus::prelude::*;
 
 /// Properties for the [`FreeCell`] and [`LockCell`] components in the Sudoku
@@ -151,9 +151,11 @@ pub fn FreeCell(cx: Scope<CellProps>) -> Element {
 
     let id = cx.props.index;
     let value = use_state(cx, String::new);
+    let class = use_state(cx, || class);
 
     cx.render(rsx!(
         div {
+            onclick: move |_| {class.set(update_class(class.to_string(), "selected", true ))},
             class: "{class}",
             id: "{id}",
             "{&value}"
