@@ -62,8 +62,7 @@ button.number {
   font-size: 50px;
 }
 
-button.delete {
-  background-image: url('data:image/svg+xml;base64,PHN2ZyBkYXRhLXNsb3Q9Imljb24iIGZpbGw9Im5vbmUiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2U9IiMzYjU5YTkiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBhcmlhLWhpZGRlbj0idHJ1ZSI+CiAgPHBhdGggc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBkPSJtOS43NSA5Ljc1IDQuNSA0LjVtMC00LjUtNC41IDQuNU0yMSAxMmE5IDkgMCAxIDEtMTggMCA5IDkgMCAwIDEgMTggMFoiPjwvcGF0aD4KPC9zdmc+');
+button.icon {
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
@@ -73,6 +72,10 @@ button.delete {
   text-indent: 100%;
   white-space: nowrap;
   overflow: hidden;
+}
+
+button.delete {
+  background-image: url('data:image/svg+xml;base64,PHN2ZyBkYXRhLXNsb3Q9Imljb24iIGZpbGw9Im5vbmUiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2U9IiMzYjU5YTkiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBhcmlhLWhpZGRlbj0idHJ1ZSI+CiAgPHBhdGggc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBkPSJtOS43NSA5Ljc1IDQuNSA0LjVtMC00LjUtNC41IDQuNU0yMSAxMmE5IDkgMCAxIDEtMTggMCA5IDkgMCAwIDEgMTggMFoiPjwvcGF0aD4KPC9zdmc+');
 }
 
 /* Responsive styles for screens with a maximum width of 450px */
@@ -97,7 +100,7 @@ button.delete {
     margin: 0.5vw;
   }
 
-  button.delete {
+  button.icon {
     width: 10vw;
     height: 10vw;
   }

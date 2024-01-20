@@ -66,7 +66,7 @@ struct NumberButtonProps {
 fn NumberButton(cx: Scope<NumberButtonProps>) -> Element {
     let number = cx.props.number;
     let class: &str = match number {
-        0 => "input delete",
+        0 => "input icon delete",
         _ => "input number",
     };
 
