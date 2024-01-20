@@ -9,9 +9,8 @@
 
 use dioxus::prelude::*;
 
-use crate::components::board::SudokuBoard;
+use crate::components::board::{SudokuBoard, SudokuPuzzle};
 
-///
 /// This function sets up the main environment for
 /// the Sudoku game in a web browser, initializes the necessary state,
 // and renders the main `SudokuBoard` component.
@@ -20,5 +19,6 @@ use crate::components::board::SudokuBoard;
 /// orchestrating the entire Sudoku game and its user interface.
 #[must_use]
 pub fn App(cx: Scope) -> Element {
-    cx.render(rsx!(SudokuBoard { sudoku: None }))
+    use_shared_state_provider(cx, SudokuPuzzle::new);
+    cx.render(rsx!(SudokuBoard {}))
 }

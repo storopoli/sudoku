@@ -2,121 +2,51 @@
 //!
 //! The `cell` module contains components representing individual cells in a
 //! Sudoku puzzle.
-//! It includes different types of cells, such as [`LockCell`] for cells
-//! with fixed values and [`FreeCell`] for cells that the player can fill.
+//! It includes a single component, [`Cell`],
+//! that represents a cell in a  Sudoku board.
 //!
-//! These components are integral to the Sudoku puzzle,
+//! [`Cell`] is integral to the Sudoku puzzle,
 //! providing interactive elements that players use to input their answers.
 //! Each cell component is responsible for rendering its content
 //! and handling user input,
 //! while conforming to the overall style and rules of the Sudoku game.
 
-use crate::utils::{get_class, update_class};
+use crate::components::board::Clicked;
+use crate::utils::get_related_cells;
 use dioxus::prelude::*;
 
-/// Properties for the [`FreeCell`] and [`LockCell`] components in the Sudoku
-/// game.
-///
-/// This struct defines the properties required to create and render a cell
-/// in the Sudoku grid.
-/// It contains information about the cell's index and value,
-/// which are used to determine
-/// the cell's content and style.
-///
-/// ## Fields
+use super::board::Related;
+
+/// Component Props for [`Cell`]
 ///
 /// - `index: u8`: The unique identifier of the cell in the grid,
 ///   ranging from 0 to 80.
 ///   The index is used to calculate the cell's position in the grid
 ///   and to derive its CSS class.
-/// - `value: u8`: The value to be displayed in the cell.
-///   A value of 0 indicates an empty cell,
-///   while values 1 through 9 represent the respective numbers in
-///   the Sudoku puzzle.
-///
-/// ## Examples
-///
-/// Creating properties for a cell with a specific value:
-///
-/// ```rust
-/// let cell_props = CellProps {
-///     index: 5,
-///     value: 3,
-/// };
-/// ```
-///
-/// In this example, `cell_props` represents a cell at index 5
-/// (sixth cell in the grid) with a value of 3.
+/// - `value: u8`: The current value of the cell.
+/// - `selected: bool`: If the cell is current clicked by the user.
+///   Cells that are clicked, should be highlighted.
+/// - `highlighted: bool`: If the cell is related to the clicked cells.
+///   Cells are related if the share the same row, column, or sub-grid
+///   in a Sudoku board.
+/// - `class: &str`: The cell's CSS class.
+///   Handled by the [`get_class`](crate::utils::get_class) function.
+/// - `mutable: bool`: If the cell's value can be changed by the user.
+///   Mutable cells are the ones that are blank when the Sudoku board is
+///   generated.
 #[allow(clippy::module_name_repetitions)]
 #[derive(Props, PartialEq, Eq)]
-pub struct CellProps {
+pub struct CellProps<'a> {
     index: u8,
     value: u8,
-    highlighted: bool,
     selected: bool,
+    highlighted: bool,
+    class: &'a str,
+    mutable: bool,
 }
 
-/// Represents a locked cell in a Sudoku puzzle.
+/// Represents a cell in a Sudoku puzzle.
 ///
-/// A `LockCell` is a cell whose value is pre-determined and cannot be changed
-/// by the user.
-/// This component is typically used for cells that are part of
-/// the initial puzzle layout.
-///
-/// ## Props
-///
-/// - `index: u8`: The unique identifier of the cell in the grid,
-///   ranging from 0 to 80.
-///   The index is used to calculate the cell's position in the grid
-///   and to derive its CSS class.
-/// - `value: u8`: The value to be displayed in the cell.
-///   A value of 0 indicates an empty cell,
-///   while values 1 through 9 represent the respective numbers in
-///   the Sudoku puzzle.
-///
-/// ## Example
-///
-/// ```rust
-/// let locked_cell = rsx!(LockCell { index: 5, value: 3 });
-/// // Renders a cell at index 5 with a fixed value of 3.
-/// ```
-#[allow(clippy::module_name_repetitions)]
-#[must_use]
-pub fn LockCell(cx: Scope<CellProps>) -> Element {
-    let base_class = get_class(cx.props.index);
-
-    // Construct the full class string
-    let class = format!(
-        "{}{}{}",
-        base_class,
-        if cx.props.highlighted {
-            " highlighted"
-        } else {
-            ""
-        },
-        if cx.props.selected { " selected" } else { "" },
-    );
-
-    let id = cx.props.index;
-    // Conditionally display the value or an empty string
-    let value = if cx.props.value != 0 {
-        cx.props.value.to_string()
-    } else {
-        String::new()
-    };
-
-    cx.render(rsx!(
-        div {
-            class: "{class}",
-            id: "{id}",
-            "{value}"
-        }
-    ))
-}
-
-/// Represents a free cell in a Sudoku puzzle.
-///
-/// A `FreeCell` is a cell that is initially empty and can be filled by the user.
 /// This component allows for user interaction to select or enter a value.
 ///
 /// ## Props
@@ -125,127 +55,57 @@ pub fn LockCell(cx: Scope<CellProps>) -> Element {
 ///   ranging from 0 to 80.
 ///   The index is used to calculate the cell's position in the grid
 ///   and to derive its CSS class.
-/// - `value: u8`: The current value of the cell, initially set to 0.
+/// - `value: u8`: The current value of the cell.
+/// - `selected: bool`: If the cell is current clicked by the user.
+///   Cells that are clicked, should be highlighted.
+/// - `highlighted: bool`: If the cell is related to the clicked cells.
+///   Cells are related if the share the same row, column, or sub-grid
+///   in a Sudoku board.
+/// - `class: &str`: The cell's CSS class.
+///   Handled by the [`get_class`](crate::utils::get_class) function.
+/// - `mutable: bool`: If the cell's value can be changed by the user.
+///   Mutable cells are the ones that are blank when the Sudoku board is
+///   generated.
 ///
-/// ## Example
+/// ## Panics
 ///
-/// ```rust
-/// let free_cell = rsx!(FreeCell { index: 10, value: 0 });
-/// // Renders an empty cell at index 10 that can be filled by the user.
-/// ```
+/// The component can panic if it cannot read the App's shared state on
+/// the clicked cell and it's related cells.
 #[allow(clippy::module_name_repetitions)]
-pub fn FreeCell(cx: Scope<CellProps>) -> Element {
-    let base_class = get_class(cx.props.index);
-
-    // Construct the full class string
-    let class = format!(
-        "{}{}{}",
-        base_class,
-        if cx.props.highlighted {
-            " highlighted"
-        } else {
-            ""
-        },
-        if cx.props.selected { " selected" } else { "" },
-    );
+#[must_use]
+pub fn Cell<'a>(cx: Scope<'a, CellProps<'a>>) -> Element<'a> {
+    let value = cx.props.value;
 
     let id = cx.props.index;
-    let value = use_state(cx, String::new);
-    let class = use_state(cx, || class);
+    let clicked = use_shared_state::<Clicked>(cx).expect("failed to get clicked shared state");
+    let related = use_shared_state::<Related>(cx).expect("failed to get related shared state");
+
+    // Conditionally display the value or an empty string
+    let free = value != 0;
+    let mut value = value.to_string();
+    if !free {
+        value = String::new();
+    };
+
+    // Conditionally have style
+    let mut style = String::new();
+    if related.read().0.contains(&id) {
+        style = "background-color: #c2ddf8;".to_string();
+    };
+    if clicked.read().0 == id {
+        style = "background-color: #e4ebf2;".to_string();
+    }
 
     cx.render(rsx!(
         div {
-            onclick: move |_| {class.set(update_class(class.to_string(), "selected", true ))},
-            class: "{class}",
+            onclick: move |_| {
+                clicked.write().0 = id;
+                related.write().0 = get_related_cells(id);
+            },
+            class: "{cx.props.class}",
             id: "{id}",
+            style: "{style}",
             "{&value}"
         }
     ))
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use dioxus_ssr::render_lazy;
-    use rand::Rng;
-    use regex::Regex;
-
-    #[test]
-    fn test_lock_cell() {
-        // Test with a non-zero value
-        let rendered_lock_cell = render_lazy(rsx!(LockCell {
-            index: 0,
-            value: 5,
-            highlighted: false,
-            selected: false
-        }));
-        assert!(rendered_lock_cell.contains('5'));
-
-        // Test with a zero value
-        let rendered_lock_cell_zero = render_lazy(rsx!(LockCell {
-            index: 1,
-            value: 0,
-            highlighted: false,
-            selected: false
-        }));
-        // Adjust this based on whether you expect to render "0" or an empty string
-        assert!(!rendered_lock_cell_zero.contains('0'));
-    }
-
-    #[test]
-    fn test_free_cell() {
-        // Assuming FreeCell starts with an empty value
-        let rendered_free_cell = render_lazy(rsx!(FreeCell {
-            index: 0,
-            value: 0,
-            highlighted: false,
-            selected: false
-        }));
-
-        // Test with a zero value
-        assert!(rendered_free_cell.contains('0'));
-    }
-
-    #[test]
-    fn test_free_cell_classes() {
-        let re = Regex::new(r#"<div[^>]*class="([^"]*)""#).expect("failed to compile regex");
-
-        for id in 0..81 {
-            let rendered = render_lazy(rsx!(FreeCell {
-                index: id,
-                value: 0,
-                highlighted: false,
-                selected: false
-            }));
-            let caps = re
-                .captures(&rendered)
-                .expect("failed to parse regex capture");
-            let class_attr = &caps[1];
-
-            assert_eq!(class_attr, get_class(id));
-        }
-    }
-
-    #[test]
-    fn test_lock_cell_classes() {
-        let mut rng = rand::thread_rng();
-
-        let re = Regex::new(r#"<div[^>]*class="([^"]*)""#).expect("failed to compile regex");
-
-        for id in 0..81 {
-            let value: u8 = rng.gen_range(1..=9);
-            let rendered = render_lazy(rsx!(LockCell {
-                index: id,
-                value: value,
-                highlighted: false,
-                selected: false
-            }));
-            let caps = re
-                .captures(&rendered)
-                .expect("failed to parse regex capture");
-            let class_attr = &caps[1];
-
-            assert_eq!(class_attr, get_class(id));
-        }
-    }
 }

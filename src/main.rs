@@ -25,6 +25,13 @@
 //! }
 //! ```
 //!
+//! ## Dependecies
+//!
+//! Under the hood Sudoku app uses:
+//!
+//! - [Dioxus](https://dioxuslabs.com/):  fullstack, crossplatform, fast Apps.
+//! - [`sudoku`](https::/docs.rs/sudoku): sudoku solving and generator.
+//!
 //! ## Contributing
 //!
 //! Contributions to the are welcome!
