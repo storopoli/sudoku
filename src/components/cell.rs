@@ -15,7 +15,7 @@ use crate::components::board::Clicked;
 use crate::utils::get_related_cells;
 use dioxus::prelude::*;
 
-use super::board::Related;
+use super::board::{Conflicting, Related};
 
 /// Component Props for [`Cell`]
 ///
@@ -76,9 +76,13 @@ pub struct CellProps<'a> {
 pub fn Cell<'a>(cx: Scope<'a, CellProps<'a>>) -> Element<'a> {
     let value = cx.props.value;
 
+    // Unpack all props and share states
     let id = cx.props.index;
-    let clicked = use_shared_state::<Clicked>(cx).expect("failed to get clicked shared state");
-    let related = use_shared_state::<Related>(cx).expect("failed to get related shared state");
+    let clicked = use_shared_state::<Clicked>(cx).expect("failed to get clicked cell shared state");
+    let related =
+        use_shared_state::<Related>(cx).expect("failed to get related cells shared state");
+    let conflicting =
+        use_shared_state::<Conflicting>(cx).expect("failed to get conflicting cells shared state");
 
     // Conditionally display the value or an empty string
     let free = value != 0;
@@ -91,6 +95,9 @@ pub fn Cell<'a>(cx: Scope<'a, CellProps<'a>>) -> Element<'a> {
     let mut style = String::new();
     if related.read().0.contains(&id) {
         style = "background-color: #c2ddf8;".to_string();
+    };
+    if conflicting.read().0.contains(&id) {
+        style = "background-color: #c2ddf8; color: #d5656f;".to_string();
     };
     if clicked.read().0 == id {
         style = "background-color: #e4ebf2;".to_string();

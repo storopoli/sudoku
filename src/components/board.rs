@@ -14,7 +14,7 @@
 use dioxus::prelude::*;
 
 use crate::components::cell::Cell;
-use crate::utils::{create_sudoku, get_class};
+use crate::utils::{create_sudoku, get_class, get_conflicting_cells};
 
 /// Shared State for clicked [`Cell`]
 ///
@@ -29,8 +29,20 @@ pub struct Clicked(pub u8);
 /// [`Cell`]s are related if they share the same row, column, or sub-grid in
 /// a Sudoku board.
 ///
-/// See also: [`get_related_cells`](crate::utils::get_related_cells)
+/// See also: [`get_related_cells`](crate::utils::get_related_cells).
 pub struct Related(pub Vec<u8>);
+
+/// Shared State for clicked [`Cell`]'s conficts
+///
+/// Represents globally across the app which cells, by id,
+/// are in conflict to the clicked [`Cell`].
+///
+/// [`Cell`]s are in conflict if they share the same row, column, or sub-grid in
+/// a Sudoku board and have the same value.
+///
+/// See also: [`get_related_cells`](crate::utils::get_related_cells)
+/// and [`get_conflicting_cells`].
+pub struct Conflicting(pub Vec<u8>);
 
 /// Shared State for the initial [`SudokuBoard`] puzzle
 pub struct SudokuPuzzle(pub [u8; 81]);
@@ -44,6 +56,37 @@ impl Default for SudokuPuzzle {
     fn default() -> Self {
         Self::new()
     }
+}
+
+#[derive(Props, PartialEq, Eq)]
+struct NumberButtonProps {
+    number: u8,
+}
+
+fn NumberButton(cx: Scope<NumberButtonProps>) -> Element {
+    let number = cx.props.number;
+
+    // Unpack shared states
+    let sudoku =
+        use_shared_state::<SudokuPuzzle>(cx).expect("failed to get sudoku puzzle shared state");
+    let conflicting =
+        use_shared_state::<Conflicting>(cx).expect("failed to get conflicting cells shared state");
+    let clicked = use_shared_state::<Clicked>(cx)
+        .expect("failed to get clicked cell shared state")
+        .read()
+        .0;
+
+    cx.render(rsx!(
+        button {
+            class: "input number",
+            onclick: move |_| {
+                // chaging the clicked cell value to the button number
+                sudoku.write().0[clicked as usize] = number;
+                conflicting.write().0 = get_conflicting_cells(&sudoku.read().0, clicked);
+            },
+            "{number}"
+        }
+    ))
 }
 
 /// Component to render a Sudoku board.
@@ -62,14 +105,16 @@ impl Default for SudokuPuzzle {
 #[allow(clippy::module_name_repetitions)]
 #[must_use]
 pub fn SudokuBoard(cx: Scope) -> Element {
+    // Unpack shared states
     let sudoku = use_shared_state::<SudokuPuzzle>(cx)
         .expect("failed to get sudoku puzzle shared state")
         .read()
         .0;
 
-    // Shared States
-    use_shared_state_provider(cx, || Clicked(90));
+    // Initialize all shared states
+    use_shared_state_provider(cx, || Clicked(90)); // this will never imply in a highlighted cell at initial state
     use_shared_state_provider(cx, || Related(vec![]));
+    use_shared_state_provider(cx, || Conflicting(vec![]));
 
     // We need to track clicked to send to the `select` Cell prop
     let clicked = use_shared_state::<Clicked>(cx);
@@ -86,5 +131,10 @@ pub fn SudokuBoard(cx: Scope) -> Element {
                     mutable: sudoku[index] == 0,
                 })
             }
+        for i in 1..=9 {
+            NumberButton {
+                number: i
+            }
+        }
     }))
 }

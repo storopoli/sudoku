@@ -25,7 +25,6 @@
   line-height: 60px;
   font-size: 30px;
   color: #38485f;
-
 }
 
 #container div:hover {
@@ -42,6 +41,21 @@
 
 .input {
   color: #3b59a9;
+}
+
+button.number {
+  background: none;
+  border: none;
+  height: 54px;
+  margin: 3px;
+  margin-top: 10px;
+  width: 54px;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: sans-serif;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 50px;
 }
 
 .lsb {

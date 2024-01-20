@@ -25,14 +25,6 @@ use sudoku::board::Sudoku;
 /// ## Returns
 ///
 /// Returns a `[u8; 81]`, which represents a 9x9 Sudoku puzzle.
-///
-/// ## Examples
-///
-/// Basic usage:
-///
-/// ```rust
-/// let puzzle = create_sudoku();
-/// ```
 #[must_use]
 pub fn create_sudoku() -> [u8; 81] {
     Sudoku::generate().to_bytes()
@@ -52,18 +44,6 @@ pub fn create_sudoku() -> [u8; 81] {
 /// ## Returns
 ///
 /// Returns a `&'static str` representing the CSS class or classes for the cell.
-///
-/// ## Examples
-///
-/// Basic usage:
-///
-/// ```rust
-/// let cell_class = get_class(0);
-/// assert_eq!(cell_class, "tsb lsb rdb bdb");
-///
-/// let cell_class = get_class(10);
-/// assert_eq!(cell_class, "bdb");
-/// ```
 ///
 /// Note: The returned classes are meant to be used in the context of a web page
 /// or a web-based UI renderer.
@@ -148,62 +128,56 @@ pub fn get_related_cells(index: u8) -> Vec<u8> {
     related_cells
 }
 
-/// Updates a class string by adding or removing a specified class.
-/// Useful for CSS class changes in DOM Elements.
+/// Identifies cells in a Sudoku puzzle that conflict with a given cell.
 ///
-/// This function takes an existing class string (`base_class`), a specific class
-/// to add or remove (`class`), and a boolean flag (`add`) that indicates whether
-/// to add or remove the class. It then updates the class string accordingly.
+/// This function takes a Sudoku board and a cell index as input and returns
+/// a list of indices representing cells that conflict with the given cell.
+/// A cell is considered to be in conflict if it is in the same row, column,
+/// or sub-grid as the target cell and has the same value.
 ///
-/// If `add` is `true` and the class is not already in the `base_class` string,
-/// the function appends it. If `add` is `false` and the class is present,
-/// the function removes it.
-/// The function also ensures that there are no leading or trailing whitespaces
-/// and that classes are separated by a single space.
+/// The function is useful for Sudoku puzzle validation,
+/// where conflicts need to be identified to ensure the rules of the game are
+/// being followed.
 ///
 /// ## Parameters
 ///
-/// - `base_class: String`: The original class string.
-/// - `class: String`: The class to add or remove.
-/// - `add: bool`: A boolean flag indicating whether to add (`true`) or remove (`false`) the class.
+/// - `board: &[u8; 81]`: A reference to a Sudoku board.
+/// - `index: u8`: The index of the cell in the Sudoku grid.
+///    Must be in the range 0 to 80.
 ///
 /// ## Returns
 ///
-/// Returns the updated class string.
+/// Returns a `Vec<u8>` containing the indices of all conflicting cells.
 ///
 /// ## Examples
 ///
-/// Adding a class:
+/// Basic usage:
 ///
 /// ```rust
-/// let class_string = "some-class another-class".to_string();
-/// let updated = update_class(class_string, "selected".to_string(), true);
-/// ```
-///
-/// Removing a class:
-///
-/// ```rust
-/// let class_string = "some-class another-class selected".to_string();
-/// let updated = update_class(class_string, "selected".to_string(), false);
+/// let board: [u8; 81] = [
+///     // ... sudoku board values ...
+/// ];
+/// let conflicts = get_conflicting_cells(&board, 5);
+/// // This will return indices of cells that conflict with the cell at index 5.
 /// ```
 #[must_use]
-pub fn update_class(mut base_class: String, class: &str, add: bool) -> String {
-    let contains_class = base_class.split_whitespace().any(|word| word == class);
+pub fn get_conflicting_cells(board: &[u8; 81], index: u8) -> Vec<u8> {
+    // Get the value of the target cell
+    let value = board[index as usize];
 
-    if add && !contains_class {
-        // Add the class if it's not present and needs to be added
-        base_class.push(' '); // Ensure there's a space before adding
-        base_class.push_str(class);
-    } else if !add && contains_class {
-        // Remove the class if it's present and needs to be removed
-        base_class = base_class
-            .split_whitespace()
-            .filter(|&word| word != class)
-            .collect::<Vec<_>>()
-            .join(" ");
+    // Ignore if the target cell is empty (value 0)
+    if value == 0 {
+        return Vec::new();
     }
 
-    base_class.trim().to_string() // Trim whitespace and return
+    // Get related cells
+    let related_cells = get_related_cells(index);
+
+    // Find cells that have the same value as the target cell
+    related_cells
+        .into_iter()
+        .filter(|&index| board[index as usize] == value)
+        .collect()
 }
 
 #[cfg(test)]
@@ -257,40 +231,83 @@ mod tests {
     }
 
     #[test]
-    fn test_update_class() {
-        assert_eq!(
-            update_class("some-class another-class".to_string(), "selected", true),
-            "some-class another-class selected"
-        );
-        assert_eq!(
-            update_class(
-                "some-class another-class selected".to_string(),
-                "selected",
-                false
-            ),
-            "some-class another-class"
-        );
-        assert_eq!(update_class(String::new(), "selected", true), "selected");
-        assert_eq!(update_class("selected".to_string(), "selected", false), "");
+    fn test_no_conflicts() {
+        let board = [
+            1, 2, 3, 4, 5, 6, 7, 8, 9, // Row 1
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 2
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 3
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 4
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 5
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 6
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 7
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 8
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 9
+        ];
+        let expected: Vec<u8> = vec![];
+        assert_eq!(get_conflicting_cells(&board, 0), expected);
+    }
 
-        // Testing removal from between other classes
-        assert_eq!(
-            update_class(
-                "some-class selected another-class".to_string(),
-                "selected",
-                false
-            ),
-            "some-class another-class"
-        );
+    #[test]
+    fn test_conflicts_in_same_row() {
+        let board = [
+            1, 2, 3, 4, 5, 6, 7, 8, 1, // Row 1 with conflict
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 2
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 3
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 4
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 5
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 6
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 7
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 8
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 9
+        ];
+        assert_eq!(get_conflicting_cells(&board, 0), vec![8]);
+    }
 
-        // Testing idempotence
-        assert_eq!(
-            update_class("some-class selected".to_string(), "selected", true),
-            "some-class selected"
-        );
-        assert_eq!(
-            update_class("some-class".to_string(), "selected", false),
-            "some-class"
-        );
+    #[test]
+    fn test_conflicts_in_same_col() {
+        let board = [
+            1, 0, 0, 0, 0, 0, 0, 0, 0, // Row 1
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 2
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 3
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 4
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 5
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 6
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 7
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 8
+            1, 0, 0, 0, 0, 0, 0, 0, 0, // Row 9 with conflict
+        ];
+        assert_eq!(get_conflicting_cells(&board, 0), vec![72]);
+    }
+
+    #[test]
+    fn test_conflicts_in_same_grid() {
+        let board = [
+            1, 0, 0, 0, 0, 0, 0, 0, 0, // Row 1
+            0, 1, 0, 0, 0, 0, 0, 0, 0, // Row 2 with conflict
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 3
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 4
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 5
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 6
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 7
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 8
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 9
+        ];
+        assert_eq!(get_conflicting_cells(&board, 0), vec![10]);
+    }
+
+    #[test]
+    fn test_conflicts_multiple() {
+        let board = [
+            1, 0, 0, 0, 0, 0, 0, 0, 1, // Row 1 with conflict
+            0, 1, 0, 0, 0, 0, 0, 0, 0, // Row 2 with conflict
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 3
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 4
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 5
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 6
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 7
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 8
+            1, 0, 0, 0, 0, 0, 0, 0, 0, // Row 9 with conflict
+        ];
+        assert_eq!(get_conflicting_cells(&board, 0), vec![8, 10, 72]);
     }
 }
