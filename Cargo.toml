@@ -8,5 +8,30 @@ license = "MIT"
 readme = "README.md"
 
 [dependencies]
+dioxus = "0.4"
+dioxus-web = "0.4"
+sudoku = "0.8"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+getrandom = { version = "0.2", features = ["js"] }
+#js-sys = "0.3"
+
+[dev-dependencies]
+dioxus-ssr = "0.4.3"
+regex = "1"
+
+[lints.rust]
+unsafe_code = "forbid" # Forbid unsafe code
+
+[lints.clippy]
+enum_glob_use = "deny" # Deny `use Enum::*`
+pedantic = "deny"      # Deny a bunch of stuff
+nursery = "deny"       # Deny another bunch of stuff
+unwrap_used = "deny"   # Deny `.unwrap()`
+
 [profile.release]
-lto = true
+opt-level = "z"   # Optimized for size, use 3 for speed
+lto = true        # Enable Link Time Optimization
+codegen-units = 1 # Reduced to increase optimizations
+panic = "abort"   # Abort on panic
+strip = "symbols" # Strip symbols from binary
