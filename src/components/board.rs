@@ -65,6 +65,10 @@ struct NumberButtonProps {
 
 fn NumberButton(cx: Scope<NumberButtonProps>) -> Element {
     let number = cx.props.number;
+    let class: &str = match number {
+        0 => "input delete",
+        _ => "input number",
+    };
 
     // Unpack shared states
     let sudoku =
@@ -78,7 +82,7 @@ fn NumberButton(cx: Scope<NumberButtonProps>) -> Element {
 
     cx.render(rsx!(
         button {
-            class: "input number",
+            class: "{class}",
             onclick: move |_| {
                 // chaging the clicked cell value to the button number
                 sudoku.write().0[clicked as usize] = number;
@@ -121,6 +125,8 @@ pub fn SudokuBoard(cx: Scope) -> Element {
 
     cx.render(rsx!(div {
         id: "container",
+
+        // Render Cells
         for (index, &value) in sudoku.iter().enumerate() {
                 rsx!(Cell {
                     index: u8::try_from(index).expect("cannot convert from u8"),
@@ -131,10 +137,17 @@ pub fn SudokuBoard(cx: Scope) -> Element {
                     mutable: sudoku[index] == 0,
                 })
             }
+
+        // Render NumberButtons
         for i in 1..=9 {
             NumberButton {
                 number: i
             }
+        }
+
+        // Render "DeleteButton", a.k.a number is 0
+        NumberButton {
+            number: 0,
         }
     }))
 }
