@@ -21,6 +21,12 @@ use crate::utils::{create_sudoku, get_class, get_conflicting_cells};
 /// Represents globally across the app which cell is clicked by id.
 pub struct Clicked(pub u8);
 
+/// Shared State for mutable clicked [`Cell`]
+///
+/// Represents globally across the app if the clicke cell is mutable.
+/// Imutable cells are the one created by the app at the initial puzzle creation.
+pub struct Mutable(pub bool);
+
 /// Shared State for clicked [`Cell`]'s related [`Cell`]s
 ///
 /// Represents globally across the app which cells, by id,
@@ -58,11 +64,22 @@ impl Default for SudokuPuzzle {
     }
 }
 
+/// Component Props for [`NumberButton`]
+///
+/// - `number: u8`: the value to be rendered in the button and also the value
+///   that dictates what the button will write to a mutable cell.
 #[derive(Props, PartialEq, Eq)]
 struct NumberButtonProps {
     number: u8,
 }
 
+/// Component to render a number button
+///
+/// This component renders buttons that are used to interact with the board.
+/// They work by assigning value to a mutable cell.
+///
+/// The number 0 is a special button that renders as a delete icon.
+/// It adds the number 0 to a mutable cell which represents an empty cell.
 fn NumberButton(cx: Scope<NumberButtonProps>) -> Element {
     let number = cx.props.number;
     let class: &str = match number {
@@ -79,18 +96,55 @@ fn NumberButton(cx: Scope<NumberButtonProps>) -> Element {
         .expect("failed to get clicked cell shared state")
         .read()
         .0;
+    let mutable = use_shared_state::<Mutable>(cx)
+        .expect("failed to get clicked cell mutability shared state")
+        .read()
+        .0;
 
     cx.render(rsx!(
         button {
             class: "{class}",
             onclick: move |_| {
-                // chaging the clicked cell value to the button number
-                sudoku.write().0[clicked as usize] = number;
-                conflicting.write().0 = get_conflicting_cells(&sudoku.read().0, clicked);
+                // if the cell is mutable
+                if mutable {
+                    // chaging the clicked cell value to the button number
+                    sudoku.write().0[clicked as usize] = number;
+                    conflicting.write().0 = get_conflicting_cells(&sudoku.read().0, clicked);
+                }
             },
             "{number}"
         }
     ))
+}
+
+/// Component to render a new button
+///
+/// This component renders a "New Game" button.
+/// When activated, all current state is dropped and the board is drawn with a
+/// fresh new puzzle for the user.
+fn NewButton(cx: Scope) -> Element {
+    // Unpack shared states
+    let sudoku =
+        use_shared_state::<SudokuPuzzle>(cx).expect("failed to get sudoku puzzle shared state");
+    let clicked = use_shared_state::<Clicked>(cx).expect("failed to get clicked cell shared state");
+    let mutable = use_shared_state::<Mutable>(cx)
+        .expect("failed to get clicked cell mutability shared state");
+    let related =
+        use_shared_state::<Related>(cx).expect("failed to get related cells shared state");
+
+    cx.render(rsx!(button {
+        class: "input icon new",
+        onclick: move |_| {
+            // resetting the board with a new puzzle
+            sudoku.write().0 = create_sudoku();
+            // resetting the clicked cell
+            clicked.write().0 = 90;
+            // resetting the mutable cell
+            mutable.write().0 = true;
+            // resetting the related list
+            related.write().0 = vec![];
+        }
+    }))
 }
 
 /// Component to render a Sudoku board.
@@ -117,6 +171,7 @@ pub fn SudokuBoard(cx: Scope) -> Element {
 
     // Initialize all shared states
     use_shared_state_provider(cx, || Clicked(90)); // this will never imply in a highlighted cell at initial state
+    use_shared_state_provider(cx, || Mutable(false));
     use_shared_state_provider(cx, || Related(vec![]));
     use_shared_state_provider(cx, || Conflicting(vec![]));
 
@@ -149,5 +204,8 @@ pub fn SudokuBoard(cx: Scope) -> Element {
         NumberButton {
             number: 0,
         }
+
+        // Render NewButton
+        NewButton{}
     }))
 }
