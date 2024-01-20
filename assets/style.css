@@ -1,7 +1,3 @@
-#main {
-  margin: 0 auto;
-}
-
 #container {
   height: auto;
   width: 540px;
@@ -80,6 +76,34 @@ button.delete {
 
 button.new {
   background-image: url("data:image/svg+xml;base64,CjxzdmcgZGF0YS1zbG90PSJpY29uIiBmaWxsPSJub25lIiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlPSIjM2I1OWE5IiB2aWV3Qm94PSIwIDAgMjQgMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgYXJpYS1oaWRkZW49InRydWUiPgogIDxwYXRoIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZD0iTTEyIDl2Nm0zLTNIOW0xMiAwYTkgOSAwIDEgMS0xOCAwIDkgOSAwIDAgMSAxOCAwWiI+PC9wYXRoPgo8L3N2Zz4K");
+}
+
+div.github {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2.5rem;
+}
+
+svg.github {
+  display: flex;
+  width: 2rem;
+  height: 2rem;
+}
+
+a.github {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  text-decoration: none;
+  font-family: sans-serif;
+  margin-left: 0.5rem;
+  color: #3b59a9;
+}
+
+a.github:visited {
+  color: #3b59a9;
+  text-decoration: none;
 }
 
 /* Responsive styles for screens with a maximum width of 450px */
