@@ -1,0 +1,173 @@
+h1 {
+  text-align: center;
+}
+
+#container {
+  height: auto;
+  width: 540px;
+  background-color: white;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  align-content: space-evenly;
+  margin: 0 auto;
+}
+
+#container div {
+  /* background-color: whitesmoke; */
+  height: 60px;
+  width: 60px;
+  box-sizing: border-box;
+  font-family: sans-serif;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 60px;
+  font-size: 30px;
+  color: #38485f;
+}
+
+#container div:hover {
+  background-color: #e4ebf2;
+}
+
+.highlight {
+  background-color: #c2ddf8;
+}
+
+.selected {
+  background-color: #e4ebf2;
+}
+
+.input {
+  color: #3b59a9;
+}
+
+button {
+  background: none;
+  border: none;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: sans-serif;
+  text-align: center;
+  vertical-align: middle;
+}
+
+button.number {
+  height: 54px;
+  width: 54px;
+  margin: 3px;
+  margin-top: 10px;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 50px;
+}
+
+button.icon {
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 60px;
+  height: 60px;
+  margin-top: 10px;
+  text-indent: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+button.delete {
+  background-image: url('data:image/svg+xml;base64,PHN2ZyBkYXRhLXNsb3Q9Imljb24iIGZpbGw9Im5vbmUiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2U9IiMzYjU5YTkiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBhcmlhLWhpZGRlbj0idHJ1ZSI+CiAgPHBhdGggc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBkPSJtOS43NSA5Ljc1IDQuNSA0LjVtMC00LjUtNC41IDQuNU0yMSAxMmE5IDkgMCAxIDEtMTggMCA5IDkgMCAwIDEgMTggMFoiPjwvcGF0aD4KPC9zdmc+');
+}
+
+button.new {
+  background-image: url("data:image/svg+xml;base64,CjxzdmcgZGF0YS1zbG90PSJpY29uIiBmaWxsPSJub25lIiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlPSIjM2I1OWE5IiB2aWV3Qm94PSIwIDAgMjQgMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgYXJpYS1oaWRkZW49InRydWUiPgogIDxwYXRoIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZD0iTTEyIDl2Nm0zLTNIOW0xMiAwYTkgOSAwIDEgMS0xOCAwIDkgOSAwIDAgMSAxOCAwWiI+PC9wYXRoPgo8L3N2Zz4K");
+}
+
+div.github {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2.5rem;
+}
+
+svg.github {
+  display: flex;
+  width: 2rem;
+  height: 2rem;
+}
+
+a.github {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  text-decoration: none;
+  font-family: sans-serif;
+  margin-left: 0.5rem;
+  color: #3b59a9;
+}
+
+a.github:visited {
+  color: #3b59a9;
+  text-decoration: none;
+}
+
+/* Responsive styles for screens with a maximum width of 450px */
+/* Subtract some px to account for margins */
+@media (max-width: 450px) {
+  #container {
+    width: calc(100vw - 30px);
+  }
+
+  #container div {
+    height: 10vw;
+    width: 10vw;
+    font-size: 6vw;
+    line-height: 10vw;
+  }
+
+  button.number {
+    height: 9vw;
+    width: 9vw;
+    font-size: 9.25vw;
+    line-height: 10vw;
+    margin: 0.5vw;
+  }
+
+  button.icon {
+    width: 10vw;
+    height: 10vw;
+  }
+
+}
+
+.lsb {
+  border-left: #38485f 2px solid;
+}
+
+.bsb {
+  border-bottom: #38485f 2px solid;
+}
+
+.rsb {
+  border-right: #38485f 2px solid;
+}
+
+.tsb {
+  border-top: #38485f 2px solid;
+}
+
+
+.ldb {
+  border-left: black 0.8px dashed;
+}
+
+.bdb {
+  border-bottom: black 0.8px dashed;
+}
+
+.rdb {
+  border-right: black 0.8px dashed;
+}
+
+.tdb {
+  border-top: black 0.8px dashed;
+}
