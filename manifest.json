@@ -24,7 +24,7 @@
       "purpose": "any"
     }
   ],
-  "start_url": "/",
+  "start_url": "/sudoku",
   "id": "/",
   "display": "standalone",
   "display_override": [
