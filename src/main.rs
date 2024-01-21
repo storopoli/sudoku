@@ -61,6 +61,9 @@ use app::App;
 /// component, along with any additional components or context providers
 /// required for the application.
 pub fn main() {
+    // init debug tool for WebAssembly
+    wasm_logger::init(wasm_logger::Config::default());
+    console_error_panic_hook::set_once();
     // launch the web app
     launch(App);
 }

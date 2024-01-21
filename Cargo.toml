@@ -1,6 +1,6 @@
 [package]
 name = "sudoku-dioxus"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 authors = ["Jose Storopoli <jose@storopoli.io>"]
 description = "Sudoku PWA with Dioxus"
@@ -11,10 +11,12 @@ readme = "README.md"
 dioxus = "0.4"
 dioxus-web = "0.4"
 sudoku = "0.8"
+# WebAssembly Debug
+wasm-logger = "0.2"
+console_error_panic_hook = "0.1"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 getrandom = { version = "0.2", features = ["js"] }
-#js-sys = "0.3"
 
 [dev-dependencies]
 dioxus-ssr = "0.4.3"
