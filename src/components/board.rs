@@ -51,18 +51,21 @@ pub struct Related(pub Vec<u8>);
 pub struct Conflicting(pub Vec<u8>);
 
 /// Shared State for the initial [`SudokuBoard`] puzzle
-pub struct SudokuPuzzle(pub [u8; 81]);
-impl SudokuPuzzle {
+pub struct InitialSudokuPuzzle(pub [u8; 81]);
+impl InitialSudokuPuzzle {
     #[must_use]
     pub fn new() -> Self {
         Self(create_sudoku())
     }
 }
-impl Default for SudokuPuzzle {
+impl Default for InitialSudokuPuzzle {
     fn default() -> Self {
         Self::new()
     }
 }
+
+/// Shared State for the current [`SudokuBoard`] puzzle
+pub struct SudokuPuzzle(pub [u8; 81]);
 
 /// Component Props for [`NumberButton`]
 ///
@@ -124,8 +127,8 @@ fn NumberButton(cx: Scope<NumberButtonProps>) -> Element {
 /// fresh new puzzle for the user.
 fn NewButton(cx: Scope) -> Element {
     // Unpack shared states
-    let sudoku =
-        use_shared_state::<SudokuPuzzle>(cx).expect("failed to get sudoku puzzle shared state");
+    let initial_sudoku = use_shared_state::<InitialSudokuPuzzle>(cx)
+        .expect("failed to get sudoku puzzle shared state");
     let clicked = use_shared_state::<Clicked>(cx).expect("failed to get clicked cell shared state");
     let mutable = use_shared_state::<Mutable>(cx)
         .expect("failed to get clicked cell mutability shared state");
@@ -136,7 +139,7 @@ fn NewButton(cx: Scope) -> Element {
         class: "input icon new",
         onclick: move |_| {
             // resetting the board with a new puzzle
-            sudoku.write().0 = create_sudoku();
+            initial_sudoku.write().0 = create_sudoku();
             // resetting the clicked cell
             clicked.write().0 = 90;
             // resetting the mutable cell
@@ -164,6 +167,10 @@ fn NewButton(cx: Scope) -> Element {
 #[must_use]
 pub fn SudokuBoard(cx: Scope) -> Element {
     // Unpack shared states
+    let initial_sudoku = use_shared_state::<InitialSudokuPuzzle>(cx)
+        .expect("failed to get sudoku puzzle shared state")
+        .read()
+        .0;
     let sudoku = use_shared_state::<SudokuPuzzle>(cx)
         .expect("failed to get sudoku puzzle shared state")
         .read()
@@ -189,7 +196,7 @@ pub fn SudokuBoard(cx: Scope) -> Element {
                     selected: clicked.expect("failed to get clicked shared state").read().0 == u8::try_from(index).expect("cannot convert from u8"),
                     highlighted: false,
                     class: get_class(u8::try_from(index).expect("cannot convert from u8")),
-                    mutable: sudoku[index] == 0,
+                    mutable: initial_sudoku[index] == 0,
                 })
             }
 

@@ -9,7 +9,7 @@
 
 use dioxus::prelude::*;
 
-use crate::components::board::{SudokuBoard, SudokuPuzzle};
+use crate::components::board::{InitialSudokuPuzzle, SudokuBoard, SudokuPuzzle};
 
 /// This function sets up the main environment for
 /// the Sudoku game in a web browser, initializes the necessary state,
@@ -19,7 +19,14 @@ use crate::components::board::{SudokuBoard, SudokuPuzzle};
 /// orchestrating the entire Sudoku game and its user interface.
 #[must_use]
 pub fn App(cx: Scope) -> Element {
-    use_shared_state_provider(cx, SudokuPuzzle::new);
+    use_shared_state_provider(cx, InitialSudokuPuzzle::new);
+    let initial_sudoku = use_shared_state::<InitialSudokuPuzzle>(cx)
+        .expect("failed to get sudoku puzzle shared state")
+        .read()
+        .0;
+    use_shared_state_provider(cx, || SudokuPuzzle {
+        0: initial_sudoku.clone(),
+    });
     cx.render(rsx!(
         h1 {
             class: "input",

@@ -1,6 +1,6 @@
 [package]
 name = "sudoku-dioxus"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 authors = ["Jose Storopoli <jose@storopoli.io>"]
 description = "Sudoku PWA with Dioxus"
@@ -11,7 +11,7 @@ readme = "README.md"
 dioxus = "0.4"
 dioxus-web = "0.4"
 sudoku = "0.8"
-# WebAssembly Debug
+# WebAssembly debug
 wasm-logger = "0.2"
 console_error_panic_hook = "0.1"
 
