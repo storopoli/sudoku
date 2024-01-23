@@ -192,6 +192,15 @@ pub fn get_conflicting_cells(board: &SudokuState, index: u8) -> Vec<u8> {
         .collect()
 }
 
+pub fn find_changed_cell(previous: &SudokuState, current: &SudokuState) -> Option<u8> {
+    for (index, (&cell1, &cell2)) in previous.iter().zip(current.iter()).enumerate() {
+        if cell1 != cell2 {
+            return Some(u8::try_from(index).expect("cannot convert from u8"));
+        }
+    }
+    None // Return None if no change is found (which should not happen in your case)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -322,4 +331,5 @@ mod tests {
         ];
         assert_eq!(get_conflicting_cells(&board, 0), vec![8, 10, 72]);
     }
+
 }

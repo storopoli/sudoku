@@ -9,7 +9,7 @@
 
 use dioxus::prelude::*;
 
-use crate::components::board::{InitialSudokuPuzzle, SudokuBoard, SudokuPuzzle};
+use crate::components::board::{InitialSudokuPuzzle, SudokuBoard, SudokuPuzzle, SudokuPuzzleMoves};
 
 /// Represents a Sudoku state with the values, as `u8`, of the 81 cells in a
 /// Sodoku game
@@ -27,12 +27,17 @@ pub type SudokuState = [u8; 81];
 /// The app will panic if fails to get initial Sudoku puzzle shared state.
 #[must_use]
 pub fn App(cx: Scope) -> Element {
+    // unpack initial puzzle
     use_shared_state_provider(cx, InitialSudokuPuzzle::new);
+
+    // set current sudoku and cache of user moves
     let initial_sudoku = use_shared_state::<InitialSudokuPuzzle>(cx)
         .expect("failed to get initial sudoku puzzle shared state")
         .read()
         .0;
     use_shared_state_provider(cx, || SudokuPuzzle(initial_sudoku));
+    use_shared_state_provider(cx, || SudokuPuzzleMoves(vec![initial_sudoku]));
+
     cx.render(rsx!(
         h1 {
             class: "input",

@@ -15,7 +15,9 @@ use dioxus::prelude::*;
 
 use crate::app::SudokuState;
 use crate::components::cell::Cell;
-use crate::utils::{create_sudoku, get_class, get_conflicting_cells};
+use crate::utils::{
+    create_sudoku, find_changed_cell, get_class, get_conflicting_cells, get_related_cells,
+};
 
 /// Shared State for clicked [`Cell`]
 ///
@@ -36,7 +38,7 @@ pub struct Mutable(pub bool);
 /// [`Cell`]s are related if they share the same row, column, or sub-grid in
 /// a Sudoku board.
 ///
-/// See also: [`get_related_cells`](crate::utils::get_related_cells).
+/// See also: [`get_related_cells`].
 pub struct Related(pub Vec<u8>);
 
 /// Shared State for clicked [`Cell`]'s conficts
@@ -47,7 +49,7 @@ pub struct Related(pub Vec<u8>);
 /// [`Cell`]s are in conflict if they share the same row, column, or sub-grid in
 /// a Sudoku board and have the same value.
 ///
-/// See also: [`get_related_cells`](crate::utils::get_related_cells)
+/// See also: [`get_related_cells`]
 /// and [`get_conflicting_cells`].
 pub struct Conflicting(pub Vec<u8>);
 
@@ -67,6 +69,9 @@ impl Default for InitialSudokuPuzzle {
 
 /// Shared State for the current [`SudokuBoard`] puzzle
 pub struct SudokuPuzzle(pub SudokuState);
+
+/// Shared State for the all the [`SudokuState`] across user moves
+pub struct SudokuPuzzleMoves(pub Vec<SudokuState>);
 
 /// Component Props for [`NumberButton`]
 ///
@@ -92,6 +97,8 @@ fn NumberButton(cx: Scope<NumberButtonProps>) -> Element {
     };
 
     // Unpack shared states
+    let moves = use_shared_state::<SudokuPuzzleMoves>(cx)
+        .expect("failed to get sudoku puzzle shared state");
     let sudoku =
         use_shared_state::<SudokuPuzzle>(cx).expect("failed to get sudoku puzzle shared state");
     let conflicting =
@@ -114,6 +121,7 @@ fn NumberButton(cx: Scope<NumberButtonProps>) -> Element {
                     // chaging the clicked cell value to the button number
                     sudoku.write().0[clicked as usize] = number;
                     let current_sudoku = sudoku.read().0;
+                    moves.write().0.push(current_sudoku);
 
                     // conflicting logic
                     let filled: Vec<u8> = sudoku
@@ -184,6 +192,94 @@ fn NewButton(cx: Scope) -> Element {
     }))
 }
 
+/// Component to render an undo button
+///
+/// This component renders a "Undo" button.
+/// When activated, all current state is dropped and the board is drawn with a
+/// fresh new puzzle for the user.
+fn UndoButton(cx: Scope) -> Element {
+    // Unpack shared states
+    let initial_sudoku = use_shared_state::<InitialSudokuPuzzle>(cx)
+        .expect("failed to get initial sudoku puzzle shared state")
+        .read()
+        .0;
+    let moves = use_shared_state::<SudokuPuzzleMoves>(cx)
+        .expect("failed to get sudoku puzzle shared state");
+    let current_sudoku = *moves
+        .read()
+        .0
+        .last()
+        .expect("failed to get the current sudoku state");
+    let sudoku =
+        use_shared_state::<SudokuPuzzle>(cx).expect("failed to get sudoku puzzle shared state");
+    let clicked = use_shared_state::<Clicked>(cx).expect("failed to get clicked cell shared state");
+    let related =
+        use_shared_state::<Related>(cx).expect("failed to get related cells shared state");
+    let conflicting =
+        use_shared_state::<Conflicting>(cx).expect("failed to get conflicting cells shared state");
+
+    cx.render(rsx!(button {
+        class: "input icon new",
+        onclick: move |_| {
+            if current_sudoku == initial_sudoku {
+                conflicting.notify_consumers();
+            } else {
+                // pop the last element of moves
+                let last_state = moves
+                    .write()
+                    .0
+                    .pop()
+                    .expect("cannot pop the last element of the sudoku moves shared state");
+
+                let new_sudoku = *moves
+                    .read()
+                    .0
+                    .last()
+                    .expect("failed to get sudoku moves shared state");
+                // resetting the board with a new puzzle
+                sudoku.write().0 = new_sudoku;
+
+                // update clicked, related
+                let last_clicked = find_changed_cell(&last_state, &new_sudoku)
+                    .expect("cannot find changed index between the two previous state");
+                clicked.write().0 = last_clicked;
+                related.write().0 = get_related_cells(last_clicked);
+
+                // conflicting logic
+                let filled: Vec<u8> = moves
+                    .read()
+                    .0
+                    .last()
+                    .unwrap()
+                    .iter()
+                    .enumerate()
+                    .filter_map(|(idx, &value)| {
+                        if value != 0 {
+                            if let Ok(index) = u8::try_from(idx) {
+                                // Safely convert usize to u8 if within range
+                                Some(index) // Return Some(index) if conversion succeeds
+                            } else {
+                                // Handle the case where usize does not fit in u8
+                                None // or panic, or log an error, etc.
+                            }
+                        } else {
+                            None // Filter out the item if the value is 0
+                        }
+                    })
+                    .collect();
+
+                let mut new_conflicting: Vec<u8> = filled
+                    .iter()
+                    .flat_map(|&v| get_conflicting_cells(&new_sudoku, v))
+                    .collect::<Vec<u8>>();
+                new_conflicting.sort_unstable();
+                new_conflicting.dedup();
+                conflicting.write().0 = new_conflicting;
+            }
+        }
+    }))
+}
+
 /// Component to render a Sudoku board.
 ///
 /// This component renders a Sudoku board which can be either randomly generated.
@@ -211,10 +307,15 @@ pub fn SudokuBoard(cx: Scope) -> Element {
         .expect("failed to get initial sudoku puzzle shared state")
         .read()
         .0;
-    let sudoku = use_shared_state::<SudokuPuzzle>(cx)
-        .expect("failed to get sudoku puzzle shared state")
+    let moves = &use_shared_state::<SudokuPuzzleMoves>(cx)
+        .expect("failed to get sudoku moves shared state")
         .read()
         .0;
+
+    let sudoku = moves
+        .last()
+        .expect("failed to get the last element of the sudoku moves shared state");
+
     let clicked = use_shared_state::<Clicked>(cx);
 
     cx.render(rsx!(div {
@@ -243,6 +344,10 @@ pub fn SudokuBoard(cx: Scope) -> Element {
         NumberButton {
             number: 0,
         }
+
+        // Render UndoButton
+        UndoButton{}
+
         // Render NewButton
         NewButton{}
     }))
