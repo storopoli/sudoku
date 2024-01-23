@@ -129,23 +129,30 @@ fn NewButton(cx: Scope) -> Element {
     // Unpack shared states
     let initial_sudoku = use_shared_state::<InitialSudokuPuzzle>(cx)
         .expect("failed to get initial sudoku puzzle shared state");
+    let sudoku =
+        use_shared_state::<SudokuPuzzle>(cx).expect("failed to get sudoku puzzle shared state");
     let clicked = use_shared_state::<Clicked>(cx).expect("failed to get clicked cell shared state");
     let mutable = use_shared_state::<Mutable>(cx)
         .expect("failed to get clicked cell mutability shared state");
     let related =
         use_shared_state::<Related>(cx).expect("failed to get related cells shared state");
+    let conflicting =
+        use_shared_state::<Conflicting>(cx).expect("failed to get conflicting cells shared state");
 
     cx.render(rsx!(button {
         class: "input icon new",
         onclick: move |_| {
             // resetting the board with a new puzzle
             initial_sudoku.write().0 = create_sudoku();
+            sudoku.write().0 = initial_sudoku.read().0;
             // resetting the clicked cell
             clicked.write().0 = 90;
             // resetting the mutable cell
             mutable.write().0 = true;
             // resetting the related list
             related.write().0 = vec![];
+            // resetting the conflicting list
+            conflicting.write().0 = vec![];
         }
     }))
 }
@@ -166,6 +173,12 @@ fn NewButton(cx: Scope) -> Element {
 #[allow(clippy::module_name_repetitions)]
 #[must_use]
 pub fn SudokuBoard(cx: Scope) -> Element {
+    // Initialize all shared states
+    use_shared_state_provider(cx, || Clicked(90)); // this will never imply in a highlighted cell at initial state
+    use_shared_state_provider(cx, || Mutable(false));
+    use_shared_state_provider(cx, || Related(vec![]));
+    use_shared_state_provider(cx, || Conflicting(vec![]));
+
     // Unpack shared states
     let initial_sudoku = use_shared_state::<InitialSudokuPuzzle>(cx)
         .expect("failed to get initial sudoku puzzle shared state")
@@ -175,14 +188,6 @@ pub fn SudokuBoard(cx: Scope) -> Element {
         .expect("failed to get sudoku puzzle shared state")
         .read()
         .0;
-
-    // Initialize all shared states
-    use_shared_state_provider(cx, || Clicked(90)); // this will never imply in a highlighted cell at initial state
-    use_shared_state_provider(cx, || Mutable(false));
-    use_shared_state_provider(cx, || Related(vec![]));
-    use_shared_state_provider(cx, || Conflicting(vec![]));
-
-    // We need to track clicked to send to the `select` Cell prop
     let clicked = use_shared_state::<Clicked>(cx);
 
     cx.render(rsx!(div {
