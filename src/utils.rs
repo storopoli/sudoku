@@ -225,7 +225,8 @@ pub fn get_conflicting_cells(board: &SudokuState, index: u8) -> Vec<u8> {
 /// let index = find_changed_cell(&old_board, &new_board);
 /// assert_eq!(index, Some(42));
 /// ```
-#[must_use] pub fn find_changed_cell(previous: &SudokuState, current: &SudokuState) -> Option<u8> {
+#[must_use]
+pub fn find_changed_cell(previous: &SudokuState, current: &SudokuState) -> Option<u8> {
     for (index, (&cell1, &cell2)) in previous.iter().zip(current.iter()).enumerate() {
         if cell1 != cell2 {
             return Some(u8::try_from(index).expect("cannot convert from u8"));
@@ -244,7 +245,8 @@ pub fn get_conflicting_cells(board: &SudokuState, index: u8) -> Vec<u8> {
 ///
 /// Retuns a `Vec<u8>` representing all cell's indices that are conflicting
 /// with the current Sudoku board.
-#[must_use] pub fn get_all_conflicting_cells(current_sudoku: &SudokuState) -> Vec<u8> {
+#[must_use]
+pub fn get_all_conflicting_cells(current_sudoku: &SudokuState) -> Vec<u8> {
     let filled: Vec<u8> = current_sudoku
         .iter()
         .enumerate()
