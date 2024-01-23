@@ -12,6 +12,8 @@ use std::borrow::Cow;
 
 use sudoku::board::Sudoku;
 
+use crate::app::SudokuState;
+
 /// Generates a new Sudoku puzzle.
 ///
 /// This function creates a complete 9x9 Sudoku puzzle. Each Sudoku puzzle
@@ -26,9 +28,9 @@ use sudoku::board::Sudoku;
 ///
 /// ## Returns
 ///
-/// Returns a `[u8; 81]`, which represents a 9x9 Sudoku puzzle.
+/// Returns a `SudokuState`, which represents a 9x9 Sudoku puzzle.
 #[must_use]
-pub fn create_sudoku() -> [u8; 81] {
+pub fn create_sudoku() -> SudokuState {
     Sudoku::generate().to_bytes()
 }
 
@@ -151,7 +153,7 @@ pub fn get_related_cells(index: u8) -> Vec<u8> {
 ///
 /// ## Parameters
 ///
-/// - `board: &[u8; 81]`: A reference to a Sudoku board.
+/// - `board: &SudokuState`: A reference to a Sudoku board.
 /// - `index: u8`: The index of the cell in the Sudoku grid.
 ///    Must be in the range 0 to 80.
 ///
@@ -164,14 +166,14 @@ pub fn get_related_cells(index: u8) -> Vec<u8> {
 /// Basic usage:
 ///
 /// ```rust
-/// let board: [u8; 81] = [
+/// let board: SudokuState = [
 ///     // ... sudoku board values ...
 /// ];
 /// let conflicts = get_conflicting_cells(&board, 5);
 /// // This will return indices of cells that conflict with the cell at index 5.
 /// ```
 #[must_use]
-pub fn get_conflicting_cells(board: &[u8; 81], index: u8) -> Vec<u8> {
+pub fn get_conflicting_cells(board: &SudokuState, index: u8) -> Vec<u8> {
     // Get the value of the target cell
     let value = board[index as usize];
 

@@ -11,6 +11,10 @@ use dioxus::prelude::*;
 
 use crate::components::board::{InitialSudokuPuzzle, SudokuBoard, SudokuPuzzle};
 
+/// Represents a Sudoku state with the values, as `u8`, of the 81 cells in a
+/// Sodoku game
+pub type SudokuState = [u8; 81];
+
 /// This function sets up the main environment for
 /// the Sudoku game in a web browser, initializes the necessary state,
 // and renders the main `SudokuBoard` component.

@@ -13,6 +13,7 @@
 
 use dioxus::prelude::*;
 
+use crate::app::SudokuState;
 use crate::components::cell::Cell;
 use crate::utils::{create_sudoku, get_class, get_conflicting_cells};
 
@@ -51,7 +52,7 @@ pub struct Related(pub Vec<u8>);
 pub struct Conflicting(pub Vec<u8>);
 
 /// Shared State for the initial [`SudokuBoard`] puzzle
-pub struct InitialSudokuPuzzle(pub [u8; 81]);
+pub struct InitialSudokuPuzzle(pub SudokuState);
 impl InitialSudokuPuzzle {
     #[must_use]
     pub fn new() -> Self {
@@ -65,7 +66,7 @@ impl Default for InitialSudokuPuzzle {
 }
 
 /// Shared State for the current [`SudokuBoard`] puzzle
-pub struct SudokuPuzzle(pub [u8; 81]);
+pub struct SudokuPuzzle(pub SudokuState);
 
 /// Component Props for [`NumberButton`]
 ///
