@@ -192,6 +192,34 @@ pub fn get_conflicting_cells(board: &SudokuState, index: u8) -> Vec<u8> {
         .collect()
 }
 
+/// Finds the index at which two given [`SudokuState`]
+/// differ by exactly one item.
+///
+/// This function iterates over both arrays in lockstep and checks for a
+/// pair of elements that are not equal.
+/// It assumes that there is exactly one such pair and returns its index.
+///
+/// ## Parameters
+///
+/// * `previous: SudokuState` - A reference to the first [`SudokuState`] to compare.
+/// * `current: SudokuState` - A reference to the second [`SudokuState`] to compare.
+///
+/// ## Returns
+///
+/// Returns `Some(usize)` with the index of the differing element if found,
+/// otherwise returns `None` if the arrays are identical (which should not
+/// happen given the problem constraints).
+///
+/// ## Examples
+///
+/// ```
+/// let old_board: SudokuState = [0; 81];
+/// let mut new_boad: SudokuState = [0; 81];
+/// new_board[42] = 1; // Introduce a change
+///
+/// let index = find_changed_cell(&old_board, &new_board);
+/// assert_eq!(index, Some(42));
+/// ```
 pub fn find_changed_cell(previous: &SudokuState, current: &SudokuState) -> Option<u8> {
     for (index, (&cell1, &cell2)) in previous.iter().zip(current.iter()).enumerate() {
         if cell1 != cell2 {
@@ -332,4 +360,38 @@ mod tests {
         assert_eq!(get_conflicting_cells(&board, 0), vec![8, 10, 72]);
     }
 
+    #[test]
+    fn test_find_changed_cell_single_difference() {
+        let old_board: SudokuState = [0; 81];
+        let mut new_board: SudokuState = [0; 81];
+        new_board[42] = 1; // Introduce a change
+
+        assert_eq!(find_changed_cell(&old_board, &new_board), Some(42));
+    }
+
+    #[test]
+    fn test_find_changed_cell_no_difference() {
+        let old_board: SudokuState = [0; 81];
+
+        // This should return None since there is no difference
+        assert_eq!(find_changed_cell(&old_board, &old_board), None);
+    }
+
+    #[test]
+    fn test_find_changed_cell_first_element() {
+        let old_board: SudokuState = [0; 81];
+        let mut new_board: SudokuState = [0; 81];
+        new_board[0] = 1; // Change the first element
+
+        assert_eq!(find_changed_cell(&old_board, &new_board), Some(0));
+    }
+
+    #[test]
+    fn test_find_changed_cell_last_element() {
+        let old_board: SudokuState = [0; 81];
+        let mut new_board: SudokuState = old_board;
+        new_board[80] = 1; // Change the last element
+
+        assert_eq!(find_changed_cell(&old_board, &new_board), Some(80));
+    }
 }
