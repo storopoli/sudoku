@@ -16,8 +16,7 @@ use dioxus::prelude::*;
 use crate::app::SudokuState;
 use crate::components::cell::Cell;
 use crate::utils::{
-    create_sudoku, find_changed_cell, get_all_conflicting_cells, get_class,
-    get_related_cells,
+    create_sudoku, find_changed_cell, get_all_conflicting_cells, get_class, get_related_cells,
 };
 
 /// Shared State for clicked [`Cell`]
@@ -51,7 +50,7 @@ pub struct Related(pub Vec<u8>);
 /// a Sudoku board and have the same value.
 ///
 /// See also: [`get_related_cells`]
-/// and [`get_conflicting_cells`].
+/// and [`get_conflicting_cells`](crate::utils::get_conflicting_cells).
 pub struct Conflicting(pub Vec<u8>);
 
 /// Shared State for the initial [`SudokuBoard`] puzzle
@@ -143,6 +142,8 @@ fn NewButton(cx: Scope) -> Element {
     // Unpack shared states
     let initial_sudoku = use_shared_state::<InitialSudokuPuzzle>(cx)
         .expect("failed to get initial sudoku puzzle shared state");
+    let moves = use_shared_state::<SudokuPuzzleMoves>(cx)
+        .expect("failed to get sudoku puzzle shared state");
     let sudoku =
         use_shared_state::<SudokuPuzzle>(cx).expect("failed to get sudoku puzzle shared state");
     let clicked = use_shared_state::<Clicked>(cx).expect("failed to get clicked cell shared state");
@@ -158,6 +159,7 @@ fn NewButton(cx: Scope) -> Element {
         onclick: move |_| {
             // resetting the board with a new puzzle
             initial_sudoku.write().0 = create_sudoku();
+            moves.write().0 = vec![initial_sudoku.read().0];
             sudoku.write().0 = initial_sudoku.read().0;
             // resetting the clicked cell
             clicked.write().0 = 90;
@@ -198,7 +200,7 @@ fn UndoButton(cx: Scope) -> Element {
         use_shared_state::<Conflicting>(cx).expect("failed to get conflicting cells shared state");
 
     cx.render(rsx!(button {
-        class: "input icon new",
+        class: "input icon undo",
         onclick: move |_| {
             if current_sudoku == initial_sudoku {
                 conflicting.notify_consumers();
