@@ -17,16 +17,18 @@ use crate::components::board::{InitialSudokuPuzzle, SudokuBoard, SudokuPuzzle};
 ///
 /// It is designed to be used as the root of the web application,
 /// orchestrating the entire Sudoku game and its user interface.
+///
+/// ## Panics
+///
+/// The app will panic if fails to get initial Sudoku puzzle shared state.
 #[must_use]
 pub fn App(cx: Scope) -> Element {
     use_shared_state_provider(cx, InitialSudokuPuzzle::new);
     let initial_sudoku = use_shared_state::<InitialSudokuPuzzle>(cx)
-        .expect("failed to get sudoku puzzle shared state")
+        .expect("failed to get initial sudoku puzzle shared state")
         .read()
         .0;
-    use_shared_state_provider(cx, || SudokuPuzzle {
-        0: initial_sudoku.clone(),
-    });
+    use_shared_state_provider(cx, || SudokuPuzzle(initial_sudoku));
     cx.render(rsx!(
         h1 {
             class: "input",

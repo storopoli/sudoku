@@ -11,6 +11,8 @@
 //! and handling user input,
 //! while conforming to the overall style and rules of the Sudoku game.
 
+use std::borrow::Cow;
+
 use crate::components::board::Clicked;
 use crate::utils::get_related_cells;
 use dioxus::prelude::*;
@@ -41,7 +43,7 @@ pub struct CellProps<'a> {
     value: u8,
     selected: bool,
     highlighted: bool,
-    class: &'a str,
+    class: Cow<'a, str>,
     mutable: bool,
 }
 

@@ -128,7 +128,7 @@ fn NumberButton(cx: Scope<NumberButtonProps>) -> Element {
 fn NewButton(cx: Scope) -> Element {
     // Unpack shared states
     let initial_sudoku = use_shared_state::<InitialSudokuPuzzle>(cx)
-        .expect("failed to get sudoku puzzle shared state");
+        .expect("failed to get initial sudoku puzzle shared state");
     let clicked = use_shared_state::<Clicked>(cx).expect("failed to get clicked cell shared state");
     let mutable = use_shared_state::<Mutable>(cx)
         .expect("failed to get clicked cell mutability shared state");
@@ -168,7 +168,7 @@ fn NewButton(cx: Scope) -> Element {
 pub fn SudokuBoard(cx: Scope) -> Element {
     // Unpack shared states
     let initial_sudoku = use_shared_state::<InitialSudokuPuzzle>(cx)
-        .expect("failed to get sudoku puzzle shared state")
+        .expect("failed to get initial sudoku puzzle shared state")
         .read()
         .0;
     let sudoku = use_shared_state::<SudokuPuzzle>(cx)
@@ -195,7 +195,7 @@ pub fn SudokuBoard(cx: Scope) -> Element {
                     value: value,
                     selected: clicked.expect("failed to get clicked shared state").read().0 == u8::try_from(index).expect("cannot convert from u8"),
                     highlighted: false,
-                    class: get_class(u8::try_from(index).expect("cannot convert from u8")),
+                    class: get_class(u8::try_from(index).expect("cannot convert from u8"), initial_sudoku[index] == 0),
                     mutable: initial_sudoku[index] == 0,
                 })
             }
