@@ -113,7 +113,33 @@ fn NumberButton(cx: Scope<NumberButtonProps>) -> Element {
                 if mutable {
                     // chaging the clicked cell value to the button number
                     sudoku.write().0[clicked as usize] = number;
-                    conflicting.write().0 = get_conflicting_cells(&sudoku.read().0, clicked);
+                    let current_sudoku = sudoku.read().0;
+
+                    // conflicting logic
+                    let filled: Vec<u8> = sudoku
+                        .read()
+                        .0
+                        .iter()
+                        .enumerate()
+                        .filter_map(|(idx, &value)| {
+                            if value != 0 {
+                                if let Some(index) = u8::try_from(idx).ok() {
+                                    // Safely convert usize to u8 if within range
+                                    Some(index) // Return Some(index) if conversion succeeds
+                                } else {
+                                    // Handle the case where usize does not fit in u8
+                                    None // or panic, or log an error, etc.
+                                }
+                            } else {
+                                None // Filter out the item if the value is 0
+                            }
+                        })
+                        .collect();
+                    let mut new_conflicting: Vec<u8> = filled.iter().flat_map(|&v| get_conflicting_cells(&current_sudoku, v))
+                    .collect::<Vec<u8>>();
+                    new_conflicting.sort_unstable();
+                    new_conflicting.dedup();
+                    conflicting.write().0 = new_conflicting;
                 }
             },
             "{number}"
@@ -217,7 +243,6 @@ pub fn SudokuBoard(cx: Scope) -> Element {
         NumberButton {
             number: 0,
         }
-
         // Render NewButton
         NewButton{}
     }))
