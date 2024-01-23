@@ -16,7 +16,8 @@ use dioxus::prelude::*;
 use crate::app::SudokuState;
 use crate::components::cell::Cell;
 use crate::utils::{
-    create_sudoku, find_changed_cell, get_class, get_conflicting_cells, get_related_cells,
+    create_sudoku, find_changed_cell, get_all_conflicting_cells, get_class,
+    get_related_cells,
 };
 
 /// Shared State for clicked [`Cell`]
@@ -124,29 +125,7 @@ fn NumberButton(cx: Scope<NumberButtonProps>) -> Element {
                     moves.write().0.push(current_sudoku);
 
                     // conflicting logic
-                    let filled: Vec<u8> = sudoku
-                        .read()
-                        .0
-                        .iter()
-                        .enumerate()
-                        .filter_map(|(idx, &value)| {
-                            if value != 0 {
-                                if let Some(index) = u8::try_from(idx).ok() {
-                                    // Safely convert usize to u8 if within range
-                                    Some(index) // Return Some(index) if conversion succeeds
-                                } else {
-                                    // Handle the case where usize does not fit in u8
-                                    None // or panic, or log an error, etc.
-                                }
-                            } else {
-                                None // Filter out the item if the value is 0
-                            }
-                        })
-                        .collect();
-                    let mut new_conflicting: Vec<u8> = filled.iter().flat_map(|&v| get_conflicting_cells(&current_sudoku, v))
-                    .collect::<Vec<u8>>();
-                    new_conflicting.sort_unstable();
-                    new_conflicting.dedup();
+                    let new_conflicting = get_all_conflicting_cells(&current_sudoku);
                     conflicting.write().0 = new_conflicting;
                 }
             },
@@ -246,34 +225,7 @@ fn UndoButton(cx: Scope) -> Element {
                 related.write().0 = get_related_cells(last_clicked);
 
                 // conflicting logic
-                let filled: Vec<u8> = moves
-                    .read()
-                    .0
-                    .last()
-                    .unwrap()
-                    .iter()
-                    .enumerate()
-                    .filter_map(|(idx, &value)| {
-                        if value != 0 {
-                            if let Ok(index) = u8::try_from(idx) {
-                                // Safely convert usize to u8 if within range
-                                Some(index) // Return Some(index) if conversion succeeds
-                            } else {
-                                // Handle the case where usize does not fit in u8
-                                None // or panic, or log an error, etc.
-                            }
-                        } else {
-                            None // Filter out the item if the value is 0
-                        }
-                    })
-                    .collect();
-
-                let mut new_conflicting: Vec<u8> = filled
-                    .iter()
-                    .flat_map(|&v| get_conflicting_cells(&new_sudoku, v))
-                    .collect::<Vec<u8>>();
-                new_conflicting.sort_unstable();
-                new_conflicting.dedup();
+                let new_conflicting = get_all_conflicting_cells(&new_sudoku);
                 conflicting.write().0 = new_conflicting;
             }
         }

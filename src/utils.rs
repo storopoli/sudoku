@@ -210,6 +210,11 @@ pub fn get_conflicting_cells(board: &SudokuState, index: u8) -> Vec<u8> {
 /// otherwise returns `None` if the arrays are identical (which should not
 /// happen given the problem constraints).
 ///
+/// ## Panics
+///
+/// The function will panic if cannot convert any of the Sudoku's board cells
+/// indexes from `usize` into a `u8`
+///
 /// ## Examples
 ///
 /// ```
@@ -220,13 +225,49 @@ pub fn get_conflicting_cells(board: &SudokuState, index: u8) -> Vec<u8> {
 /// let index = find_changed_cell(&old_board, &new_board);
 /// assert_eq!(index, Some(42));
 /// ```
-pub fn find_changed_cell(previous: &SudokuState, current: &SudokuState) -> Option<u8> {
+#[must_use] pub fn find_changed_cell(previous: &SudokuState, current: &SudokuState) -> Option<u8> {
     for (index, (&cell1, &cell2)) in previous.iter().zip(current.iter()).enumerate() {
         if cell1 != cell2 {
             return Some(u8::try_from(index).expect("cannot convert from u8"));
         }
     }
     None // Return None if no change is found (which should not happen in your case)
+}
+
+/// Get all the conflictings cells for all filled cells in a Sudoku board
+///
+/// ## Parameters
+///
+/// - `current_sudoku: SudokuState` - A reference to the current [`SudokuState`]
+///
+/// ## Returns
+///
+/// Retuns a `Vec<u8>` representing all cell's indices that are conflicting
+/// with the current Sudoku board.
+#[must_use] pub fn get_all_conflicting_cells(current_sudoku: &SudokuState) -> Vec<u8> {
+    let filled: Vec<u8> = current_sudoku
+        .iter()
+        .enumerate()
+        .filter_map(|(idx, &value)| {
+            if value != 0 {
+                u8::try_from(idx).ok()
+            } else {
+                None // Filter out the item if the value is 0
+            }
+        })
+        .collect();
+
+    // Get all conflicting cells for the filled cells
+    let mut conflicting: Vec<u8> = filled
+        .iter()
+        .flat_map(|&v| get_conflicting_cells(current_sudoku, v))
+        .collect::<Vec<u8>>();
+
+    // Retain unique
+    conflicting.sort_unstable();
+    conflicting.dedup();
+
+    conflicting
 }
 
 #[cfg(test)]
