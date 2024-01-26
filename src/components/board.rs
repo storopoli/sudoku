@@ -116,8 +116,11 @@ fn NumberButton(cx: Scope<NumberButtonProps>) -> Element {
         button {
             class: "{class}",
             onclick: move |_| {
+                // if the value is the same
+                if sudoku.read().0[clicked as usize] == number {
+                }
                 // if the cell is mutable
-                if mutable {
+                 else if mutable {
                     // chaging the clicked cell value to the button number
                     sudoku.write().0[clicked as usize] = number;
                     let current_sudoku = sudoku.read().0;
