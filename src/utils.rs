@@ -243,7 +243,7 @@ pub fn find_changed_cell(previous: &SudokuState, current: &SudokuState) -> Optio
 ///
 /// ## Returns
 ///
-/// Retuns a `Vec<u8>` representing all cell's indices that are conflicting
+/// Returns a `Vec<u8>` representing all cell's indices that are conflicting
 /// with the current Sudoku board.
 #[must_use]
 pub fn get_all_conflicting_cells(current_sudoku: &SudokuState) -> Vec<u8> {
