@@ -291,6 +291,7 @@ pub fn get_all_conflicting_cells(current_sudoku: &SudokuState) -> Vec<u8> {
 ///
 /// The function will panic if it cannot convert the current sudoku to a
 /// `sudoku::Sudoku` or if it cannot find a unique solution.
+#[must_use]
 pub fn get_hint(current_sudoku: &SudokuState) -> SudokuState {
     // Get the indices of the empty cells
     let empty_cells: Vec<usize> = current_sudoku
@@ -329,6 +330,21 @@ pub fn get_hint(current_sudoku: &SudokuState) -> SudokuState {
     let (idx, val) = random_hint;
     hint[idx] = *val;
     hint
+}
+
+/// Removes conflicting cells
+///
+/// This function takes a mutable reference to a Sudoku board and a list of
+/// conflicting cells and sets the value of each conflicting cell to 0.
+///
+/// ## Parameters
+///
+/// - `sudoku: &mut SudokuState` - A mutable reference to the current [`SudokuState`]
+/// - `conflicting: &[u8]` - A slice of conflicting cells indices
+pub fn remove_conflicting_cells(sudoku: &mut SudokuState, conflicting: &[u8]) {
+    for &idx in conflicting {
+        sudoku[idx as usize] = 0;
+    }
 }
 
 #[cfg(test)]
@@ -502,5 +518,24 @@ mod tests {
         let board: SudokuState = Sudoku::generate().to_bytes();
         let hint = get_hint(&board);
         find_changed_cell(&board, &hint).expect("Expected a difference");
+    }
+
+    // test removed conflicting cells
+    #[test]
+    fn test_remove_conflicting_cells() {
+        let mut board = [
+            1, 0, 0, 0, 0, 0, 0, 0, 1, // Row 1 with conflict
+            0, 1, 0, 0, 0, 0, 0, 0, 0, // Row 2 with conflict
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 3
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 4
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 5
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 6
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 7
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 8
+            1, 0, 0, 0, 0, 0, 0, 0, 0, // Row 9 with conflict
+        ];
+        let conflicting = get_all_conflicting_cells(&board);
+        remove_conflicting_cells(&mut board, &conflicting);
+        assert_eq!(get_all_conflicting_cells(&board), Vec::<u8>::new());
     }
 }
