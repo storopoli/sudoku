@@ -6,6 +6,8 @@
     <img src="screenshot.png" alt="Description" width="300"/>
 </div>
 
+I tell the history of this game in the [blog post](https://storopoli.io/2024-01-30-sudoku/).
+
 ## Performance
 
 🔫
@@ -15,7 +17,7 @@ This is the fastest Sudoku game in the West!
   and [Dioxus](https://dioxuslabs.com).
 - Compiles to [Web Assembly (WASM)](https://webassembly.org/).
 - Efficient stack-allocated data structures with `&str` and `u8` everywhere.
-- Fast sudoku generation using the [`sudoku`](https://lib.rs/sudoku) crate.
+- Fast sudoku generation and solution finding using the [`sudoku`](https://lib.rs/sudoku) crate.
 
 After seeing my mom playing her favorite game in an ad-plagued spyware in
 her mobile phone, I've built this for her.
