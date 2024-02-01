@@ -304,7 +304,7 @@ pub fn find_solution(current_sudoku: &SudokuState) -> Result<SudokuState> {
         .some_solution();
 
     solution.map_or_else(
-        || Err(Error::msg("No unique solution found")),
+        || Err(Error::msg("No solution found")),
         |solution| Ok(solution.to_bytes()),
     )
 }
