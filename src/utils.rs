@@ -10,7 +10,8 @@
 
 use std::borrow::Cow;
 
-use sudoku::board::Sudoku;
+use rand::{seq::SliceRandom, thread_rng};
+use sudoku::Sudoku;
 
 use crate::app::SudokuState;
 
@@ -272,6 +273,64 @@ pub fn get_all_conflicting_cells(current_sudoku: &SudokuState) -> Vec<u8> {
     conflicting
 }
 
+/// Returns a hint of the next move towards a solution
+///
+/// The implementation details are interesting.
+/// We find a unique solution, then we get a random selection based on the
+/// indices of the current empty cells.
+///
+/// ## Parameters
+///
+/// - `current_sudoku: &SudokuState` - A reference to the current [`SudokuState`]
+///
+/// ## Returns
+///
+/// Returns a new [`SudokuState`] with a hint of the next move towards a solution
+///
+/// ## Panics
+///
+/// The function will panic if it cannot convert the current sudoku to a
+/// `sudoku::Sudoku` or if it cannot find a unique solution.
+pub fn get_hint(current_sudoku: &SudokuState) -> SudokuState {
+    // Get the indices of the empty cells
+    let empty_cells: Vec<usize> = current_sudoku
+        .iter()
+        .enumerate()
+        .filter_map(|(idx, val)| if *val == 0 { Some(idx) } else { None })
+        .collect();
+
+    // Convert back the SudokuState to a sudoku::Sudoku
+    let solution = Sudoku::from_bytes_slice(current_sudoku)
+        .expect("could not convert the current sudoku to a sudoku::Sudoku")
+        .solution()
+        .expect("could not find a unique sudoku solution")
+        .to_bytes();
+
+    // If there's an unique solution, get a random selection of the possible hints.
+    // That is, a random selection in the unique solution filtered by the current
+    // empty cells indices
+    let random_hint = *solution
+        .iter()
+        .enumerate()
+        .filter_map(|(idx, val)| {
+            if empty_cells.contains(&idx) {
+                Some((idx, val))
+            } else {
+                None
+            }
+        })
+        .collect::<Vec<_>>()
+        .choose(&mut thread_rng())
+        .expect("could not get a random hint");
+
+    // Merge the random hint into the current SudokuState and return a new
+    // SudokuState
+    let mut hint = *current_sudoku;
+    let (idx, val) = random_hint;
+    hint[idx] = *val;
+    hint
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -436,5 +495,12 @@ mod tests {
         new_board[80] = 1; // Change the last element
 
         assert_eq!(find_changed_cell(&old_board, &new_board), Some(80));
+    }
+
+    #[test]
+    fn test_get_hint_on_valid_board() {
+        let board: SudokuState = Sudoku::generate().to_bytes();
+        let hint = get_hint(&board);
+        find_changed_cell(&board, &hint).expect("Expected a difference");
     }
 }

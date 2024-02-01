@@ -10,6 +10,7 @@ readme = "README.md"
 [dependencies]
 dioxus = "0.4"
 dioxus-web = "0.4"
+rand = "0.8"
 sudoku = "0.8"
 # WebAssembly debug
 wasm-logger = "0.2"
