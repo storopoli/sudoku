@@ -10,7 +10,9 @@
 
 use std::borrow::Cow;
 
-use sudoku::board::Sudoku;
+use anyhow::{Error, Result};
+use rand::{seq::SliceRandom, thread_rng};
+use sudoku::Sudoku;
 
 use crate::app::SudokuState;
 
@@ -272,6 +274,115 @@ pub fn get_all_conflicting_cells(current_sudoku: &SudokuState) -> Vec<u8> {
     conflicting
 }
 
+/// Finds a solution for a given Sudoku puzzle.
+///
+/// This function takes a Sudoku puzzle as input and attempts to find a
+/// solution for it. If any solution is found, it is returned as a
+/// `SudokuState`. If no solution is found an error is returned.
+///
+/// ## Parameters
+///
+/// - `current_sudoku: &SudokuState` - A reference to the current [`SudokuState`]
+///
+/// ## Returns
+///
+/// Returns a Result containing the full solution as a `SudokuState` if found,
+/// otherwise returns an error.
+///
+/// ## Errors
+///
+/// If the Sudoku puzzle has no solution, an error is returned.
+///
+/// ## Panics
+///
+/// The function will panic if it cannot convert the current sudoku to a
+/// `sudoku::Sudoku` or if it cannot find a solution.
+pub fn find_solution(current_sudoku: &SudokuState) -> Result<SudokuState> {
+    // Convert back the SudokuState to a sudoku::Sudoku
+    let solution = Sudoku::from_bytes_slice(current_sudoku)
+        .expect("could not convert the current sudoku to a sudoku::Sudoku")
+        .some_solution();
+
+    solution.map_or_else(
+        || Err(Error::msg("No solution found")),
+        |solution| Ok(solution.to_bytes()),
+    )
+}
+
+/// Returns a hint of the next move towards a solution
+///
+/// The implementation details are interesting.
+/// We find a solution, then we get a random selection based on the
+/// indices of the current empty cells.
+///
+/// ## Parameters
+///
+/// - `current_sudoku: &SudokuState` - A reference to the current [`SudokuState`]
+///
+/// ## Returns
+///
+/// Returns a Result containing the a random hint as a `SudokuState` if a solution is found,
+/// otherwise returns an error.
+///
+/// ## Errors
+///
+/// If the Sudoku puzzle has no solution, an error is returned.
+///
+/// ## Panics
+///
+/// The function will panic if it cannot convert the current sudoku to a
+/// `sudoku::Sudoku` or if it cannot find a unique solution.
+pub fn get_hint(current_sudoku: &SudokuState) -> Result<SudokuState> {
+    // Get the solution for the current Sudoku board
+    let solution = find_solution(current_sudoku)?;
+
+    // Get the indices of the empty cells
+    let empty_cells: Vec<usize> = current_sudoku
+        .iter()
+        .enumerate()
+        .filter_map(|(idx, val)| if *val == 0 { Some(idx) } else { None })
+        .collect();
+
+    // If there's a solution, get a random selection of the possible hints.
+    // That is, a random selection in the unique solution filtered by the current
+    // empty cells indices
+    let random_hint = *solution
+        .iter()
+        .enumerate()
+        .filter_map(|(idx, val)| {
+            if empty_cells.contains(&idx) {
+                Some((idx, val))
+            } else {
+                None
+            }
+        })
+        .collect::<Vec<_>>()
+        .choose(&mut thread_rng())
+        .expect("could not get a random hint");
+
+    // Merge the random hint into the current SudokuState and return a new
+    // SudokuState
+    let mut hint = *current_sudoku;
+    let (idx, val) = random_hint;
+    hint[idx] = *val;
+    Ok(hint)
+}
+
+/// Removes conflicting cells
+///
+/// This function takes a mutable reference to a Sudoku board and a list of
+/// conflicting cells and sets the value of each conflicting cell to 0.
+///
+/// ## Parameters
+///
+/// - `sudoku: &mut SudokuState` - A mutable reference to the current [`SudokuState`]
+/// - `conflicting: &[u8]` - A slice of conflicting cells indices
+pub fn remove_conflicting_cells(sudoku: &mut SudokuState, conflicting: &[u8]) {
+    for &idx in conflicting {
+        sudoku[idx as usize] = 0;
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -436,5 +547,31 @@ mod tests {
         new_board[80] = 1; // Change the last element
 
         assert_eq!(find_changed_cell(&old_board, &new_board), Some(80));
+    }
+
+    #[test]
+    fn test_get_hint_on_valid_board() {
+        let board: SudokuState = Sudoku::generate().to_bytes();
+        let hint = get_hint(&board).expect("could not get a hint");
+        find_changed_cell(&board, &hint).expect("Expected a difference");
+    }
+
+    // test removed conflicting cells
+    #[test]
+    fn test_remove_conflicting_cells() {
+        let mut board = [
+            1, 0, 0, 0, 0, 0, 0, 0, 1, // Row 1 with conflict
+            0, 1, 0, 0, 0, 0, 0, 0, 0, // Row 2 with conflict
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 3
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 4
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 5
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 6
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 7
+            0, 0, 0, 0, 0, 0, 0, 0, 0, // Row 8
+            1, 0, 0, 0, 0, 0, 0, 0, 0, // Row 9 with conflict
+        ];
+        let conflicting = get_all_conflicting_cells(&board);
+        remove_conflicting_cells(&mut board, &conflicting);
+        assert_eq!(get_all_conflicting_cells(&board), Vec::<u8>::new());
     }
 }

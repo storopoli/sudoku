@@ -16,7 +16,8 @@ use dioxus::prelude::*;
 use crate::app::SudokuState;
 use crate::components::cell::Cell;
 use crate::utils::{
-    create_sudoku, find_changed_cell, get_all_conflicting_cells, get_class, get_related_cells,
+    create_sudoku, find_changed_cell, get_all_conflicting_cells, get_class, get_hint,
+    get_related_cells, remove_conflicting_cells,
 };
 
 /// Shared State for clicked [`Cell`]
@@ -237,6 +238,121 @@ fn UndoButton(cx: Scope) -> Element {
     }))
 }
 
+/// Component to render a hint button
+///
+/// This component renders a "Hint" button.
+/// When activated, the button will give the user a hint by filling a cell with a value.
+/// It also handles the UI updates for the clicked, related and conflicting cells.
+///
+/// ## Panics
+///
+/// The component will panic if cannot find the changed cell between the two previous states.
+#[must_use]
+pub fn HintButton(cx: Scope) -> Element {
+    // Unpack shared states
+    let moves = use_shared_state::<SudokuPuzzleMoves>(cx)
+        .expect("failed to get sudoku puzzle shared state");
+    let current_sudoku = *moves
+        .read()
+        .0
+        .last()
+        .expect("failed to get the current sudoku state");
+    let sudoku =
+        use_shared_state::<SudokuPuzzle>(cx).expect("failed to get sudoku puzzle shared state");
+    let clicked = use_shared_state::<Clicked>(cx).expect("failed to get clicked cell shared state");
+    let related =
+        use_shared_state::<Related>(cx).expect("failed to get related cells shared state");
+    let conflicting =
+        use_shared_state::<Conflicting>(cx).expect("failed to get conflicting cells shared state");
+
+    cx.render(rsx!(button {
+        class: "input icon hint",
+        onclick: move |_| {
+            #[cfg(debug_assertions)]
+            log::info!("entering hint button onclick event handler");
+
+            // If there are conflicting cells, remove all of them
+            if !conflicting.read().0.is_empty() {
+                #[cfg(debug_assertions)]
+                log::info!("conflicting cells found, removing them");
+
+                let mut current_sudoku = current_sudoku;
+                let conficting_cells = get_all_conflicting_cells(&current_sudoku);
+                remove_conflicting_cells(&mut current_sudoku, &conficting_cells);
+
+                // update the moves state with new sudoku
+                moves.write().0.push(current_sudoku);
+
+                // update the conflicting state
+                conflicting.write().0 = vec![];
+
+                // update the sudoku state
+                sudoku.write().0 = current_sudoku;
+            }
+
+            // get a new SudokuState with an added hint
+            let new_sudoku = get_hint(&current_sudoku);
+
+            new_sudoku.map_or_else(
+                |_| {
+                    #[cfg(debug_assertions)]
+                    log::info!("no hint found");
+
+                    // remove all conflicting cells
+                    let mut current_sudoku = current_sudoku;
+                    let conficting_cells = get_all_conflicting_cells(&current_sudoku);
+                    remove_conflicting_cells(&mut current_sudoku, &conficting_cells);
+
+                    // update the moves state with new sudoku
+                    moves.write().0.push(current_sudoku);
+
+                    // update the conflicting state
+                    conflicting.write().0 = vec![];
+
+                    // update the sudoku state
+                    sudoku.write().0 = current_sudoku;
+
+                    // get a new SudokuState with an added hint
+                    let new_sudoku = get_hint(&current_sudoku).expect("no hint found");
+
+                    // get the last clicked cell
+                    let last_clicked = find_changed_cell(&current_sudoku, &new_sudoku)
+                        .expect("cannot find changed index between the two previous state");
+
+                    // resetting the board with a new puzzle
+                    sudoku.write().0 = new_sudoku;
+                    moves.write().0.push(new_sudoku);
+
+                    // update clicked, related
+                    clicked.write().0 = last_clicked;
+                    related.write().0 = get_related_cells(last_clicked);
+
+                    // conflicting logic
+                    let new_conflicting = get_all_conflicting_cells(&new_sudoku);
+                    conflicting.write().0 = new_conflicting;
+                },
+                |new_sudoku| {
+                    // get the last clicked cell
+                    let last_clicked = find_changed_cell(&current_sudoku, &new_sudoku)
+                        .expect("cannot find changed index between the two previous state");
+
+                    // resetting the board with a new puzzle
+                    sudoku.write().0 = new_sudoku;
+                    moves.write().0.push(new_sudoku);
+
+                    // update clicked, related
+                    clicked.write().0 = last_clicked;
+                    related.write().0 = get_related_cells(last_clicked);
+
+                    // conflicting logic
+                    let new_conflicting = get_all_conflicting_cells(&new_sudoku);
+                    conflicting.write().0 = new_conflicting;
+                },
+            );
+        }
+    }))
+}
+
 /// Component to render a Sudoku board.
 ///
 /// This component renders a Sudoku board which can be either randomly generated.
@@ -301,6 +417,9 @@ pub fn SudokuBoard(cx: Scope) -> Element {
         NumberButton {
             number: 0,
         }
+
+        // Render HintButton
+        HintButton{}
 
         // Render UndoButton
         UndoButton{}
