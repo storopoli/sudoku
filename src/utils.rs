@@ -10,6 +10,7 @@
 
 use std::borrow::Cow;
 
+use anyhow::{Error, Result};
 use rand::{seq::SliceRandom, thread_rng};
 use sudoku::Sudoku;
 
@@ -273,10 +274,45 @@ pub fn get_all_conflicting_cells(current_sudoku: &SudokuState) -> Vec<u8> {
     conflicting
 }
 
+/// Finds a solution for a given Sudoku puzzle.
+///
+/// This function takes a Sudoku puzzle as input and attempts to find a
+/// solution for it. If any solution is found, it is returned as a
+/// `SudokuState`. If no solution is found an error is returned.
+///
+/// ## Parameters
+///
+/// - `current_sudoku: &SudokuState` - A reference to the current [`SudokuState`]
+///
+/// ## Returns
+///
+/// Returns a Result containing the full solution as a `SudokuState` if found,
+/// otherwise returns an error.
+///
+/// ## Errors
+///
+/// If the Sudoku puzzle has no solution, an error is returned.
+///
+/// ## Panics
+///
+/// The function will panic if it cannot convert the current sudoku to a
+/// `sudoku::Sudoku` or if it cannot find a solution.
+pub fn find_solution(current_sudoku: &SudokuState) -> Result<SudokuState> {
+    // Convert back the SudokuState to a sudoku::Sudoku
+    let solution = Sudoku::from_bytes_slice(current_sudoku)
+        .expect("could not convert the current sudoku to a sudoku::Sudoku")
+        .some_solution();
+
+    solution.map_or_else(
+        || Err(Error::msg("No unique solution found")),
+        |solution| Ok(solution.to_bytes()),
+    )
+}
+
 /// Returns a hint of the next move towards a solution
 ///
 /// The implementation details are interesting.
-/// We find a unique solution, then we get a random selection based on the
+/// We find a solution, then we get a random selection based on the
 /// indices of the current empty cells.
 ///
 /// ## Parameters
@@ -285,14 +321,21 @@ pub fn get_all_conflicting_cells(current_sudoku: &SudokuState) -> Vec<u8> {
 ///
 /// ## Returns
 ///
-/// Returns a new [`SudokuState`] with a hint of the next move towards a solution
+/// Returns a Result containing the a random hint as a `SudokuState` if a solution is found,
+/// otherwise returns an error.
+///
+/// ## Errors
+///
+/// If the Sudoku puzzle has no solution, an error is returned.
 ///
 /// ## Panics
 ///
 /// The function will panic if it cannot convert the current sudoku to a
 /// `sudoku::Sudoku` or if it cannot find a unique solution.
-#[must_use]
-pub fn get_hint(current_sudoku: &SudokuState) -> SudokuState {
+pub fn get_hint(current_sudoku: &SudokuState) -> Result<SudokuState> {
+    // Get the solution for the current Sudoku board
+    let solution = find_solution(current_sudoku)?;
+
     // Get the indices of the empty cells
     let empty_cells: Vec<usize> = current_sudoku
         .iter()
@@ -300,14 +343,7 @@ pub fn get_hint(current_sudoku: &SudokuState) -> SudokuState {
         .filter_map(|(idx, val)| if *val == 0 { Some(idx) } else { None })
         .collect();
 
-    // Convert back the SudokuState to a sudoku::Sudoku
-    let solution = Sudoku::from_bytes_slice(current_sudoku)
-        .expect("could not convert the current sudoku to a sudoku::Sudoku")
-        .solution()
-        .expect("could not find a unique sudoku solution")
-        .to_bytes();
-
-    // If there's an unique solution, get a random selection of the possible hints.
+    // If there's a solution, get a random selection of the possible hints.
     // That is, a random selection in the unique solution filtered by the current
     // empty cells indices
     let random_hint = *solution
@@ -329,7 +365,7 @@ pub fn get_hint(current_sudoku: &SudokuState) -> SudokuState {
     let mut hint = *current_sudoku;
     let (idx, val) = random_hint;
     hint[idx] = *val;
-    hint
+    Ok(hint)
 }
 
 /// Removes conflicting cells
@@ -516,7 +552,7 @@ mod tests {
     #[test]
     fn test_get_hint_on_valid_board() {
         let board: SudokuState = Sudoku::generate().to_bytes();
-        let hint = get_hint(&board);
+        let hint = get_hint(&board).expect("could not get a hint");
         find_changed_cell(&board, &hint).expect("Expected a difference");
     }
 
