@@ -47,6 +47,9 @@
 #![allow(non_snake_case)]
 use dioxus_web::launch;
 
+#[cfg(debug_assertions)]
+use log::{info, LevelFilter};
+
 pub mod app;
 pub mod components;
 pub mod utils;
@@ -60,10 +63,18 @@ use app::App;
 /// It sets up the necessary environment and  renders the main `SudokuBoard`
 /// component, along with any additional components or context providers
 /// required for the application.
+///
+/// ## Panics
+///
+/// If in debug mode, this function will panic if it fails to initialize the
+/// Dioxuslogger.
 pub fn main() {
-    // init debug tool for WebAssembly
-    wasm_logger::init(wasm_logger::Config::default());
-    console_error_panic_hook::set_once();
+    #[cfg(debug_assertions)]
+    {
+        // init logger for Dioxus
+        dioxus_logger::init(LevelFilter::Info).expect("failed to init logger");
+    }
     // launch the web app
+    info!("Launching Sudoku app");
     launch(App);
 }

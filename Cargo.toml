@@ -12,9 +12,9 @@ dioxus = "0.4"
 dioxus-web = "0.4"
 rand = "0.8"
 sudoku = "0.8"
-# WebAssembly debug
-wasm-logger = "0.2"
-console_error_panic_hook = "0.1"
+# Dioxus debug
+dioxus-logger = "0.4"
+log = "0.4"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 getrandom = { version = "0.2", features = ["js"] }
