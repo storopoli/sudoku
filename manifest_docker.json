@@ -1,0 +1,42 @@
+{
+  "name": "Sudoku",
+  "icons": [
+    {
+      "src": "favicon_32x32.png",
+      "type": "image/png",
+      "sizes": "32x32"
+    },
+    {
+      "src": "favicon_192x192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "favicon_512x512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "favicon_512x512.png",
+      "type": "image/png",
+      "sizes": "any",
+      "purpose": "any"
+    }
+  ],
+  "start_url": "/",
+  "id": "/",
+  "display": "standalone",
+  "display_override": [
+    "window-control-overlay",
+    "standalone"
+  ],
+  "scope": "/",
+  "theme_color": "#000000",
+  "background_color": "#ffffff",
+  "short_name": "Sudoku",
+  "description": "Sudoku PWA",
+  "dir": "ltr",
+  "lang": "en",
+  "orientation": "portrait"
+}
