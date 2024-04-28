@@ -1,0 +1,15 @@
+version: '3.9'
+
+services:
+  sudoku:
+    container_name: 'sudoku'
+    image: 'sudoku'
+    build: .
+    ports:
+      - '1005:8080'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "10"
+    restart: 'unless-stopped'

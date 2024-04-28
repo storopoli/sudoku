@@ -22,6 +22,16 @@ This is the fastest Sudoku game in the West!
 After seeing my mom playing her favorite game in an ad-plagued spyware in
 her mobile phone, I've built this for her.
 
+## Deployment
+
+A Docker Compose file is provided to build and run the application.
+
+```bash
+docker-compose up --detach
+```
+
+The application will be available at `http://localhost:1005`.
+
 ## License
 
 The source code is licensed under a
