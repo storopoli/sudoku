@@ -31,9 +31,7 @@ pub fn App() -> Element {
     use_context_provider(|| Signal::new(InitialSudokuPuzzle::new()));
 
     // set current sudoku and cache of user moves
-    let initial_sudoku = use_context::<Signal<InitialSudokuPuzzle>>()
-        .read()
-        .0;
+    let initial_sudoku = use_context::<Signal<InitialSudokuPuzzle>>().read().0;
     use_context_provider(|| Signal::new(SudokuPuzzle(initial_sudoku)));
     use_context_provider(|| Signal::new(SudokuPuzzleMoves(vec![initial_sudoku])));
 

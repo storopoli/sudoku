@@ -180,9 +180,7 @@ fn NewButton() -> Element {
 #[component]
 fn UndoButton() -> Element {
     // Unpack shared states
-    let initial_sudoku = use_context::<Signal<InitialSudokuPuzzle>>()
-        .read()
-        .0;
+    let initial_sudoku = use_context::<Signal<InitialSudokuPuzzle>>().read().0;
     let mut moves = use_context::<Signal<SudokuPuzzleMoves>>();
     let current_sudoku = *moves
         .read()
@@ -295,7 +293,7 @@ pub fn HintButton() -> Element {
 
                 // get the last clicked cell
                 let last_clicked = find_changed_cell(&sudoku.read().0, &new_sudoku)
-                .expect("cannot find changed index between the two previous state");
+                    .expect("cannot find changed index between the two previous state");
 
                 // update all states
                 sudoku.write().0 = new_sudoku;
@@ -305,7 +303,6 @@ pub fn HintButton() -> Element {
                 related.write().0 = get_related_cells(last_clicked);
                 conflicting.write().0 = get_all_conflicting_cells(&new_sudoku);
             }
-
         }
     })
 }
@@ -333,9 +330,7 @@ pub fn SudokuBoard() -> Element {
     use_context_provider(|| Signal::new(Conflicting(vec![])));
 
     // Unpack shared states
-    let initial_sudoku = use_context::<Signal<InitialSudokuPuzzle>>()
-        .read()
-        .0;
+    let initial_sudoku = use_context::<Signal<InitialSudokuPuzzle>>().read().0;
     let moves = use_context::<Signal<SudokuPuzzleMoves>>();
 
     let sudoku = &moves.read().0;
