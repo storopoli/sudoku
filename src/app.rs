@@ -17,7 +17,7 @@ pub type SudokuState = [u8; 81];
 
 /// This function sets up the main environment for
 /// the Sudoku game in a web browser, initializes the necessary state,
-// and renders the main `SudokuBoard` component.
+/// and renders the main [`SudokuBoard`] component.
 ///
 /// It is designed to be used as the root of the web application,
 /// orchestrating the entire Sudoku game and its user interface.
@@ -25,20 +25,17 @@ pub type SudokuState = [u8; 81];
 /// ## Panics
 ///
 /// The app will panic if fails to get initial Sudoku puzzle shared state.
-#[must_use]
-pub fn App(cx: Scope) -> Element {
-    // unpack initial puzzle
-    use_shared_state_provider(cx, InitialSudokuPuzzle::new);
+#[component]
+pub fn App() -> Element {
+    // set initial puzzle
+    use_context_provider(|| Signal::new(InitialSudokuPuzzle::new()));
 
     // set current sudoku and cache of user moves
-    let initial_sudoku = use_shared_state::<InitialSudokuPuzzle>(cx)
-        .expect("failed to get initial sudoku puzzle shared state")
-        .read()
-        .0;
-    use_shared_state_provider(cx, || SudokuPuzzle(initial_sudoku));
-    use_shared_state_provider(cx, || SudokuPuzzleMoves(vec![initial_sudoku]));
+    let initial_sudoku = use_context::<Signal<InitialSudokuPuzzle>>().read().0;
+    use_context_provider(|| Signal::new(SudokuPuzzle(initial_sudoku)));
+    use_context_provider(|| Signal::new(SudokuPuzzleMoves(vec![initial_sudoku])));
 
-    cx.render(rsx!(
+    rsx!(
         h1 {
             class: "input",
             "Sudoku"
@@ -64,5 +61,5 @@ pub fn App(cx: Scope) -> Element {
                 "storopoli/sudoku"
             }
         }
-    ))
+    )
 }

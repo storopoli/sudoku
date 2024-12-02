@@ -15,7 +15,6 @@ asset_dir = "assets"
 [web.app]
 # HTML title tag content
 title = "Sudoku in the Browser"
-base_path = "sudoku"
 
 [web.watcher]
 

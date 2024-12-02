@@ -37,13 +37,13 @@ use super::board::{Conflicting, Mutable, Related};
 ///   Mutable cells are the ones that are blank when the Sudoku board is
 ///   generated.
 #[allow(clippy::module_name_repetitions)]
-#[derive(Props, PartialEq, Eq)]
-pub struct CellProps<'a> {
+#[derive(Props, Clone, PartialEq, Eq)]
+pub struct CellProps {
     index: u8,
     value: u8,
     selected: bool,
     highlighted: bool,
-    class: Cow<'a, str>,
+    class: Cow<'static, str>,
     mutable: bool,
 }
 
@@ -74,20 +74,18 @@ pub struct CellProps<'a> {
 /// The component can panic if it cannot read the App's shared state on
 /// the clicked cell and it's related cells.
 #[allow(clippy::module_name_repetitions)]
+#[allow(clippy::needless_pass_by_value)]
 #[must_use]
-pub fn Cell<'a>(cx: Scope<'a, CellProps<'a>>) -> Element<'a> {
-    let value = cx.props.value;
-    let is_mutable = cx.props.mutable;
+pub fn Cell(props: CellProps) -> Element {
+    let value = props.value;
+    let is_mutable = props.mutable;
 
     // Unpack all props and share states
-    let id = cx.props.index;
-    let clicked = use_shared_state::<Clicked>(cx).expect("failed to get clicked cell shared state");
-    let mutable = use_shared_state::<Mutable>(cx)
-        .expect("failed to get clicked cell mutability shared state");
-    let related =
-        use_shared_state::<Related>(cx).expect("failed to get related cells shared state");
-    let conflicting =
-        use_shared_state::<Conflicting>(cx).expect("failed to get conflicting cells shared state");
+    let id = props.index;
+    let mut clicked = use_context::<Signal<Clicked>>();
+    let mut mutable = use_context::<Signal<Mutable>>();
+    let mut related = use_context::<Signal<Related>>();
+    let conflicting = use_context::<Signal<Conflicting>>();
 
     // Conditionally display the value or an empty string
     let free = value != 0;
@@ -108,17 +106,17 @@ pub fn Cell<'a>(cx: Scope<'a, CellProps<'a>>) -> Element<'a> {
         style = "background-color: #e4ebf2;".to_string();
     }
 
-    cx.render(rsx!(
+    rsx!(
         div {
             onclick: move |_| {
                 clicked.write().0 = id;
                 mutable.write().0 = is_mutable;
                 related.write().0 = get_related_cells(id);
             },
-            class: "{cx.props.class}",
+            class: "{props.class}",
             id: "{id}",
             style: "{style}",
             "{&value}"
         }
-    ))
+    )
 }

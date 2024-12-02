@@ -333,6 +333,11 @@ pub fn find_solution(current_sudoku: &SudokuState) -> Result<SudokuState> {
 /// The function will panic if it cannot convert the current sudoku to a
 /// `sudoku::Sudoku` or if it cannot find a unique solution.
 pub fn get_hint(current_sudoku: &SudokuState) -> Result<SudokuState> {
+    // If sudoku is complete, then no hint is possible
+    if current_sudoku.iter().all(|&val| val != 0) {
+        return Ok(*current_sudoku);
+    }
+
     // Get the solution for the current Sudoku board
     let solution = find_solution(current_sudoku)?;
 

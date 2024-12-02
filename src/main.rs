@@ -20,8 +20,8 @@
 //!
 //! use crate::components::board::SudokuBoard;
 //!
-//! pub fn App(cx: Scope) -> Element {
-//!     cx.render(rsx!(SudokuBoard { sudoku: None }))
+//! pub fn App() -> Element {
+//!     rsx!(SudokuBoard { sudoku: None })
 //! }
 //! ```
 //!
@@ -45,10 +45,11 @@
 //! [MIT license](https://opensource.org/licenses/MIT).
 
 #![allow(non_snake_case)]
-use dioxus_web::launch;
+use dioxus::launch;
 
 #[cfg(debug_assertions)]
-use log::{info, LevelFilter};
+use dioxus_logger::tracing::Level;
+use log::info;
 
 pub mod app;
 pub mod components;
@@ -72,7 +73,7 @@ pub fn main() {
     #[cfg(debug_assertions)]
     {
         // init logger for Dioxus
-        dioxus_logger::init(LevelFilter::Info).expect("failed to init logger");
+        dioxus_logger::init(Level::INFO).expect("failed to init logger");
     }
     // launch the web app
     #[cfg(debug_assertions)]
