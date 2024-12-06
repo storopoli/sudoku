@@ -6,7 +6,7 @@
     <img src="screenshot.png" alt="Description" width="300"/>
 </div>
 
-I tell the history of this game in the [blog post](https://storopoli.io/2024-01-30-sudoku/).
+I tell the history of this game in the [blog post](https://storopoli.com/blog/2024-01-30-sudoku/).
 
 ## Performance
 
