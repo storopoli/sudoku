@@ -1,35 +1,35 @@
 [package]
 name = "sudoku-dioxus"
-version = "0.5.0"
+version = "0.5.1"
 edition = "2021"
-authors = ["Jose Storopoli <jose@storopoli.io>"]
+authors = ["Jose Storopoli <jose@storopoli.com>"]
 description = "Sudoku PWA with Dioxus"
 readme = "README.md"
 
 [dependencies]
 anyhow = "1.0.94"
-dioxus = { version = "0.5.6", features = ["web"] }
+dioxus = { version = "0.6.0", features = ["web"] }
 rand = "0.8.5"
 sudoku = "0.8"
 # Dioxus debug
-dioxus-logger = "0.5.1"
+dioxus-logger = "0.6.0"
 log = "0.4.22"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 getrandom = { version = "0.2.15", features = ["js"] }
 
 [dev-dependencies]
-dioxus-ssr = "0.5.6"
+dioxus-ssr = "0.6.0"
 regex = "1.11.1"
 
 [lints.rust]
 unsafe_code = "forbid" # Forbid unsafe code
 
 [lints.clippy]
-enum_glob_use = "deny" # Deny `use Enum::*`
+enum_glob_use = "deny"                       # Deny `use Enum::*`
 pedantic = { level = "deny", priority = -1 } # Deny a bunch of stuff
-nursery = { level = "deny", priority = -1 } # Deny another bunch of stuff
-unwrap_used = "deny" # Deny `.unwrap()`
+nursery = { level = "deny", priority = -1 }  # Deny another bunch of stuff
+unwrap_used = "deny"                         # Deny `.unwrap()`
 
 [profile.release]
 opt-level = "z"   # Optimized for size, use 3 for speed
