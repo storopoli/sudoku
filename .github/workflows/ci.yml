@@ -6,7 +6,7 @@ env:
 on:
   push:
     branches:
-    - main
+      - main
   pull_request: {}
   workflow_dispatch: null
 
@@ -14,26 +14,26 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: dtolnay/rust-toolchain@stable
-      with:
-        components: clippy, rustfmt
-    - uses: Swatinem/rust-cache@v2
-    - name: Check
-      run: cargo clippy --all-targets --all-features -- -D warnings
-    - name: rustfmt
-      run: cargo fmt --all --check
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+      - uses: Swatinem/rust-cache@v2
+      - name: Check
+        run: cargo clippy --all-targets --all-features -- -D warnings
+      - name: rustfmt
+        run: cargo fmt --all --check
 
   check-docs:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: dtolnay/rust-toolchain@stable
-    - uses: Swatinem/rust-cache@v2
-    - name: cargo doc
-      env:
-        RUSTDOCFLAGS: "-D rustdoc::all -A rustdoc::private-doc-tests"
-      run: cargo doc --all-features --no-deps
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: cargo doc
+        env:
+          RUSTDOCFLAGS: "-D rustdoc::all -A rustdoc::private-doc-tests"
+        run: cargo doc --all-features --no-deps
 
   test-versions:
     needs: check
@@ -42,10 +42,10 @@ jobs:
       matrix:
         rust: [stable, beta]
     steps:
-    - uses: actions/checkout@v4
-    - uses: dtolnay/rust-toolchain@master
-      with:
-        toolchain: ${{ matrix.rust }}
-    - uses: Swatinem/rust-cache@v2
-    - name: Run tests
-      run: cargo test --all-features --all-targets
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
+      - uses: Swatinem/rust-cache@v2
+      - name: Run tests
+        run: cargo test --all-features --all-targets

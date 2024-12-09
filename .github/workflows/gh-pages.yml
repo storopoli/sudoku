@@ -16,17 +16,17 @@ jobs:
       contents: write
       pages: write
     steps:
-    - uses: actions/checkout@v4
-    - uses: dtolnay/rust-toolchain@stable
-      with:
-        targets: wasm32-unknown-unknown
-    - uses: Swatinem/rust-cache@v2
-    - name: Install Dioxus
-      run: cargo install dioxus-cli
-    - name: Build app
-      run: dx build --release
-    - name: Deploy Project 🚀
-      uses: JamesIves/github-pages-deploy-action@v4
-      with:
-        branch: gh-pages
-        folder: dist
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+      - name: Install Dioxus
+        run: cargo install dioxus-cli@0.5.6
+      - name: Build app
+        run: dx build --release
+      - name: Deploy Project 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: dist
