@@ -51,7 +51,7 @@ pub struct CellProps {
 ///
 /// This component allows for user interaction to select or enter a value.
 ///
-/// ## Props
+/// # Props
 ///
 /// - `index: u8`: The unique identifier of the cell in the grid,
 ///   ranging from 0 to 80.
@@ -69,13 +69,12 @@ pub struct CellProps {
 ///   Mutable cells are the ones that are blank when the Sudoku board is
 ///   generated.
 ///
-/// ## Panics
+/// # Errors
 ///
 /// The component can panic if it cannot read the App's shared state on
 /// the clicked cell and it's related cells.
 #[allow(clippy::module_name_repetitions)]
 #[allow(clippy::needless_pass_by_value)]
-#[must_use]
 pub fn Cell(props: CellProps) -> Element {
     let value = props.value;
     let is_mutable = props.mutable;

@@ -22,7 +22,7 @@ pub type SudokuState = [u8; 81];
 /// It is designed to be used as the root of the web application,
 /// orchestrating the entire Sudoku game and its user interface.
 ///
-/// ## Panics
+/// # Panics
 ///
 /// The app will panic if fails to get initial Sudoku puzzle shared state.
 #[component]
