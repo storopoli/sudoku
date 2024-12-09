@@ -8,6 +8,7 @@
 //! setting up the environment, and managing the application lifecycle.
 
 use dioxus::prelude::*;
+use document::Stylesheet;
 
 use crate::components::board::{InitialSudokuPuzzle, SudokuBoard, SudokuPuzzle, SudokuPuzzleMoves};
 
@@ -36,6 +37,7 @@ pub fn App() -> Element {
     use_context_provider(|| Signal::new(SudokuPuzzleMoves(vec![initial_sudoku])));
 
     rsx!(
+        Stylesheet { href: asset!("./assets/style.css") }
         h1 {
             class: "input",
             "Sudoku"

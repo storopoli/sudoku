@@ -27,27 +27,6 @@ watch_path = ["src", "assets"]
 # Dioxus will serve the root page when a route is not found
 index_on_404 = true
 
-# Include style or script assets
-[web.resource]
-
-# CSS style file
-style = ["./style.css"]
-
-# Javascript code file
-script = []
-
-[web.resource.dev]
-
-# Same as [web.resource], but for development servers
-# If you want to include a file in a dx serve server,
-# but not a dx serve --release server, put it here
-
-# CSS style file
-style = []
-
-# JavaScript files
-script = []
-
 [[web.proxy]]
 
 # Proxies will forward requests to a new service.
