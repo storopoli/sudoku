@@ -19,13 +19,13 @@
   <body>
     <div id="main"></div>
     <script type="module">
-      import init from "/./assets/dioxus/Sudoku.js";
-    init("/./assets/dioxus/Sudoku_bg.wasm").then(wasm => {
+      import init from "/./assets/dioxus/sudoku-dioxus.js";
+    init("/./assets/dioxus/sudoku-dioxus_bg.wasm").then(wasm => {
       if (wasm.__wbindgen_start == undefined) {
         wasm.main();
       }
     });
     </script>
-    
+    {script_include}
   </body>
 </html>
