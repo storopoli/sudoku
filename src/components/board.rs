@@ -6,7 +6,7 @@
 //! handling user interactions,
 //! and updating the state of the board as the game progresses.
 //!
-//! This module provides the [`SudokuBoard`] component,
+//! This module provides the [`SudokuBoard()`] component,
 //! which is the central element of the Sudoku game interface,
 //! displaying the puzzle to the user and allowing interaction
 //!  with individual cells.
@@ -58,7 +58,7 @@ pub struct Related(pub Vec<u8>);
 #[derive(Debug, Clone)]
 pub struct Conflicting(pub Vec<u8>);
 
-/// Shared State for the initial [`SudokuBoard`] puzzle
+/// Shared State for the initial [`SudokuBoard()`] puzzle
 #[derive(Debug, Clone)]
 pub struct InitialSudokuPuzzle(pub SudokuState);
 
@@ -74,7 +74,7 @@ impl Default for InitialSudokuPuzzle {
     }
 }
 
-/// Shared State for the current [`SudokuBoard`] puzzle
+/// Shared State for the current [`SudokuBoard()`] puzzle
 #[derive(Debug, Clone)]
 pub struct SudokuPuzzle(pub SudokuState);
 
