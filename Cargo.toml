@@ -19,7 +19,7 @@ log = "0.4.22"
 getrandom = { version = "0.2.15", features = ["js"] }
 
 [dev-dependencies]
-dioxus-ssr = "0.5.6"
+dioxus-ssr = "0.6.0"
 regex = "1.11.1"
 
 [lints.rust]

@@ -337,7 +337,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b8e7fe217b50d43b27528b0f24c89b411f742a3e7564d1cfbf85253f967954db"
 dependencies = [
  "dioxus-config-macro",
- "dioxus-core",
+ "dioxus-core 0.5.6",
  "dioxus-core-macro",
  "dioxus-fullstack",
  "dioxus-hooks",
@@ -378,7 +378,7 @@ checksum = "3730d2459ab66951cedf10b09eb84141a6eda7f403c28057cbe010495be156b7"
 dependencies = [
  "futures-channel",
  "futures-util",
- "generational-box",
+ "generational-box 0.5.6",
  "longest-increasing-subsequence",
  "rustc-hash",
  "serde",
@@ -386,6 +386,27 @@ dependencies = [
  "slotmap",
  "tracing",
  "tracing-subscriber",
+]
+
+[[package]]
+name = "dioxus-core"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "39093c4358bc8b6c80728f9cdc7e8854cdd8ecf8b932fa2864817f6df0103ff0"
+dependencies = [
+ "const_format",
+ "dioxus-core-types",
+ "futures-channel",
+ "futures-util",
+ "generational-box 0.6.0",
+ "longest-increasing-subsequence",
+ "rustc-hash",
+ "rustversion",
+ "serde",
+ "slab",
+ "slotmap",
+ "tracing",
+ "warnings",
 ]
 
 [[package]]
@@ -401,6 +422,15 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "dioxus-core-types"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5a6f64e5d70de1e1492bc845c1f99e3687195a6134598437be6186b768315aa0"
+dependencies = [
+ "once_cell",
 ]
 
 [[package]]
@@ -438,12 +468,12 @@ version = "0.5.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fa8f9c661eea82295219d25555d5c0b597e74186b029038ceb5e3700ccbd4380"
 dependencies = [
- "dioxus-core",
+ "dioxus-core 0.5.6",
  "dioxus-debug-cell",
  "dioxus-signals",
  "futures-channel",
  "futures-util",
- "generational-box",
+ "generational-box 0.5.6",
  "slab",
  "thiserror",
  "tracing",
@@ -455,7 +485,7 @@ version = "0.5.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "77d01246cb1b93437fb0bbd0dd11cfc66342d86b4311819e76654f2017ce1473"
 dependencies = [
- "dioxus-core",
+ "dioxus-core 0.5.6",
  "dioxus-html",
  "dioxus-rsx",
  "interprocess-docfix",
@@ -470,12 +500,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f01a0826f179adad6ea8d6586746e8edde0c602cc86f4eb8e5df7a3b204c4018"
 dependencies = [
  "async-trait",
- "dioxus-core",
+ "dioxus-core 0.5.6",
  "dioxus-html-internal-macro",
  "enumset",
  "euclid",
  "futures-channel",
- "generational-box",
+ "generational-box 0.5.6",
  "keyboard-types",
  "serde",
  "serde-value",
@@ -519,7 +549,7 @@ version = "0.5.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8bd39b2c41dd1915dcb91d914ea72d8b646f1f8995aaeff82816b862ec586ecd"
 dependencies = [
- "dioxus-core",
+ "dioxus-core 0.5.6",
  "dioxus-core-macro",
  "dioxus-hooks",
  "dioxus-html",
@@ -576,7 +606,7 @@ version = "0.5.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "15c400bc8a779107d8f3a67b14375db07dbd2bc31163bf085a8e9097f36f7179"
 dependencies = [
- "dioxus-core",
+ "dioxus-core 0.5.6",
  "internment",
  "krates",
  "proc-macro2",
@@ -591,10 +621,10 @@ version = "0.5.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7e3e224cd3d3713f159f0199fc088c292a0f4adb94996b48120157f6a8f8342d"
 dependencies = [
- "dioxus-core",
+ "dioxus-core 0.5.6",
  "futures-channel",
  "futures-util",
- "generational-box",
+ "generational-box 0.5.6",
  "once_cell",
  "parking_lot",
  "rustc-hash",
@@ -603,21 +633,14 @@ dependencies = [
 
 [[package]]
 name = "dioxus-ssr"
-version = "0.5.6"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "753b1eb29372bb3afcdbc0ac603893802a8b7b70fa94b86a1641408e2b87173b"
+checksum = "e6cd3d309a60d654bafcf49b32b96fa72da6d9155582eba9b5c608c07ab0c850"
 dependencies = [
  "askama_escape",
- "async-trait",
- "dioxus-core",
- "dioxus-html",
- "generational-box",
- "http 1.1.0",
- "lru",
+ "dioxus-core 0.6.0",
+ "dioxus-core-types",
  "rustc-hash",
- "serde_json",
- "thiserror",
- "tracing",
 ]
 
 [[package]]
@@ -628,12 +651,12 @@ checksum = "e0855ac81fcc9252a0863930a7a7cbb2504fc1b6efe893489c8d0e23aaeb2cb9"
 dependencies = [
  "async-trait",
  "console_error_panic_hook",
- "dioxus-core",
+ "dioxus-core 0.5.6",
  "dioxus-html",
  "dioxus-interpreter-js",
  "futures-channel",
  "futures-util",
- "generational-box",
+ "generational-box 0.5.6",
  "js-sys",
  "rustc-hash",
  "serde",
@@ -866,6 +889,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "557cf2cbacd0504c6bf8c29f52f8071e0de1d9783346713dc6121d7fa1e5d0e0"
 dependencies = [
  "parking_lot",
+]
+
+[[package]]
+name = "generational-box"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bbef36525d55a549ea17c1a33ddbd0dcfd153029e640c9eef845b24ae053dbed"
+dependencies = [
+ "parking_lot",
+ "tracing",
 ]
 
 [[package]]
@@ -1675,6 +1708,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "rustversion"
+version = "1.0.18"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0e819f2bc632f285be6d7cd36e25940d45b2391dd6d9b939e79de557f7014248"
+
+[[package]]
 name = "ryu"
 version = "1.0.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2143,6 +2182,28 @@ name = "version_check"
 version = "0.9.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
+
+[[package]]
+name = "warnings"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "64f68998838dab65727c9b30465595c6f7c953313559371ca8bf31759b3680ad"
+dependencies = [
+ "pin-project",
+ "tracing",
+ "warnings-macro",
+]
+
+[[package]]
+name = "warnings-macro"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "59195a1db0e95b920366d949ba5e0d3fc0e70b67c09be15ce5abb790106b0571"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
 
 [[package]]
 name = "wasi"
