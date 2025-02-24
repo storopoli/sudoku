@@ -25,7 +25,7 @@
 //! }
 //! ```
 //!
-//! ## Dependecies
+//! ## Dependencies
 //!
 //! Under the hood Sudoku app uses:
 //!
@@ -49,6 +49,7 @@ use dioxus::launch;
 
 #[cfg(debug_assertions)]
 use dioxus_logger::tracing::Level;
+#[cfg(debug_assertions)]
 use log::info;
 
 pub mod app;
