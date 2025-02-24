@@ -24,13 +24,10 @@
       "purpose": "any"
     }
   ],
-  "start_url": "/sudoku",
+  "start_url": "/",
   "id": "/",
   "display": "standalone",
-  "display_override": [
-    "window-control-overlay",
-    "standalone"
-  ],
+  "display_override": ["window-control-overlay", "standalone"],
   "scope": "/",
   "theme_color": "#000000",
   "background_color": "#ffffff",

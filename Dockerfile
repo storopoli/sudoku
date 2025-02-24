@@ -20,9 +20,6 @@ RUN cargo install dioxus-cli --locked
 
 # Copy project's root dir
 COPY . .
-# COPY the docker specific files to Dioxus
-COPY Dioxus_docker.toml Dioxus.toml
-COPY assets/manifest_docker.json assets/manifest.json
 
 # Build the application
 RUN dx build --release --verbose

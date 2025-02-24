@@ -8,6 +8,7 @@
 //! setting up the environment, and managing the application lifecycle.
 
 use dioxus::prelude::*;
+use document::Stylesheet;
 
 use crate::components::board::{InitialSudokuPuzzle, SudokuBoard, SudokuPuzzle, SudokuPuzzleMoves};
 
@@ -17,12 +18,12 @@ pub type SudokuState = [u8; 81];
 
 /// This function sets up the main environment for
 /// the Sudoku game in a web browser, initializes the necessary state,
-/// and renders the main [`SudokuBoard`] component.
+/// and renders the main [`SudokuBoard()`] component.
 ///
 /// It is designed to be used as the root of the web application,
 /// orchestrating the entire Sudoku game and its user interface.
 ///
-/// ## Panics
+/// # Panics
 ///
 /// The app will panic if fails to get initial Sudoku puzzle shared state.
 #[component]
@@ -36,6 +37,7 @@ pub fn App() -> Element {
     use_context_provider(|| Signal::new(SudokuPuzzleMoves(vec![initial_sudoku])));
 
     rsx!(
+        Stylesheet { href: asset!("./assets/style.css") }
         h1 {
             class: "input",
             "Sudoku"
