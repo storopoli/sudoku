@@ -1535,7 +1535,6 @@ version = "0.6.0"
 dependencies = [
  "anyhow",
  "dioxus",
- "dioxus-logger",
  "dioxus-ssr",
  "getrandom",
  "log",

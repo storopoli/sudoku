@@ -45,7 +45,7 @@ pub struct Mutable(pub bool);
 #[derive(Debug, Clone)]
 pub struct Related(pub Vec<u8>);
 
-/// Shared State for clicked [`Cell`]'s conficts
+/// Shared State for clicked [`Cell`]'s conflicts
 ///
 /// Represents globally across the app which cells, by id,
 /// are in conflict to the clicked [`Cell`].
@@ -122,7 +122,7 @@ fn NumberButton(props: NumberButtonProps) -> Element {
                 }
                 // if the cell is mutable
                  else if mutable {
-                    // chaging the clicked cell value to the button number
+                    // changing the clicked cell value to the button number
                     sudoku.write().0[clicked as usize] = number;
                     let current_sudoku = sudoku.read().0;
                     moves.write().0.push(current_sudoku);
@@ -263,8 +263,8 @@ pub fn HintButton() -> Element {
                 log::info!("conflicting cells found, removing them");
 
                 let mut current_sudoku = current_sudoku;
-                let conficting_cells = get_all_conflicting_cells(&current_sudoku);
-                remove_conflicting_cells(&mut current_sudoku, &conficting_cells);
+                let conflicting_cells = get_all_conflicting_cells(&current_sudoku);
+                remove_conflicting_cells(&mut current_sudoku, &conflicting_cells);
 
                 // update the moves state with new sudoku
                 moves.write().0.push(current_sudoku);
@@ -280,8 +280,8 @@ pub fn HintButton() -> Element {
             let new_sudoku = get_hint(&sudoku.read().0).unwrap_or_else(|_| {
                 // If no hint found, try again after removing conflicts
                 let mut current_sudoku = sudoku.read().0;
-                let conficting_cells = get_all_conflicting_cells(&current_sudoku);
-                remove_conflicting_cells(&mut current_sudoku, &conficting_cells);
+                let conflicting_cells = get_all_conflicting_cells(&current_sudoku);
+                remove_conflicting_cells(&mut current_sudoku, &conflicting_cells);
 
                 get_hint(&current_sudoku).expect("no hint found even after removing conflicts")
             });

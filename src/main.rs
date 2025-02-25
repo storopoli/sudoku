@@ -48,7 +48,7 @@
 use dioxus::launch;
 
 #[cfg(debug_assertions)]
-use dioxus_logger::tracing::Level;
+use dioxus::logger::tracing::Level;
 #[cfg(debug_assertions)]
 use log::info;
 
@@ -74,7 +74,7 @@ pub fn main() {
     #[cfg(debug_assertions)]
     {
         // init logger for Dioxus
-        dioxus_logger::init(Level::INFO).expect("failed to init logger");
+        dioxus::logger::init(Level::INFO).expect("failed to init logger");
     }
     // launch the web app
     #[cfg(debug_assertions)]
