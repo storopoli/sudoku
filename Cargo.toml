@@ -1,6 +1,6 @@
 [package]
 name = "sudoku-dioxus"
-version = "0.6.0"
+version = "0.6.1"
 edition = "2024"
 authors = ["Jose Storopoli <jose@storopoli.com>"]
 description = "Sudoku PWA with Dioxus"
