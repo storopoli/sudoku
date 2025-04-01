@@ -9,7 +9,7 @@ readme = "README.md"
 [dependencies]
 anyhow = "1.0.97"
 dioxus = { version = "0.6.3", features = ["web"] }
-rand = "0.8.5"
+rand = "0.9.0"
 sudoku = "0.8"
 # Dioxus debug
 log = "0.4.27"
