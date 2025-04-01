@@ -11,7 +11,7 @@
 use std::borrow::Cow;
 
 use anyhow::{Error, Result};
-use rand::{seq::SliceRandom, thread_rng};
+use rand::{rng, seq::IndexedRandom};
 use sudoku::Sudoku;
 
 use crate::app::SudokuState;
@@ -362,7 +362,7 @@ pub fn get_hint(current_sudoku: &SudokuState) -> Result<SudokuState> {
             }
         })
         .collect::<Vec<_>>()
-        .choose(&mut thread_rng())
+        .choose(&mut rng())
         .expect("could not get a random hint");
 
     // Merge the random hint into the current SudokuState and return a new
