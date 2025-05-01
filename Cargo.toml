@@ -15,7 +15,7 @@ sudoku = "0.8"
 log = "0.4.27"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-getrandom = { version = "0.2.15", features = ["js"] }
+getrandom = { version = "0.2.16", features = ["js"] }
 
 [dev-dependencies]
 dioxus-ssr = "0.6.2"
