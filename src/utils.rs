@@ -94,7 +94,7 @@ pub fn get_class(id: u8, mutable: bool) -> Cow<'static, str> {
 /// # Parameters
 ///
 /// - `index: u8`: The index of the cell in the Sudoku grid.
-///    Must be in the range 0 to 80.
+///   Must be in the range 0 to 80.
 ///
 /// # Returns
 ///
@@ -157,7 +157,7 @@ pub fn get_related_cells(index: u8) -> Vec<u8> {
 ///
 /// - `board: &SudokuState`: A reference to a Sudoku board.
 /// - `index: u8`: The index of the cell in the Sudoku grid.
-///    Must be in the range 0 to 80.
+///   Must be in the range 0 to 80.
 ///
 /// # Returns
 ///

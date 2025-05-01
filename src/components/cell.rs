@@ -88,22 +88,21 @@ pub fn Cell(props: CellProps) -> Element {
 
     // Conditionally display the value or an empty string
     let free = value != 0;
-    let mut value = value.to_string();
-    if !free {
-        value = String::new();
+    let value = if free {
+        value.to_string()
+    } else {
+        String::new()
     };
-
     // Conditionally have style
-    let mut style = String::new();
-    if related.read().0.contains(&id) {
-        style = "background-color: #c2ddf8;".to_string();
+    let style = if clicked.read().0 == id {
+        "background-color: #e4ebf2;".to_string()
+    } else if conflicting.read().0.contains(&id) {
+        "background-color: #d5656f;".to_string()
+    } else if related.read().0.contains(&id) {
+        "background-color: #c2ddf8;".to_string()
+    } else {
+        String::new()
     };
-    if conflicting.read().0.contains(&id) {
-        style = "background-color: #d5656f;".to_string();
-    };
-    if clicked.read().0 == id {
-        style = "background-color: #e4ebf2;".to_string();
-    }
 
     rsx!(
         div {
