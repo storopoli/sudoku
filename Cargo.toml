@@ -7,7 +7,7 @@ description = "Sudoku PWA with Dioxus"
 readme = "README.md"
 
 [dependencies]
-anyhow = "1.0.97"
+anyhow = "1.0.98"
 dioxus = { version = "0.6.3", features = ["web"] }
 rand = "0.8.5"
 sudoku = "0.8"
